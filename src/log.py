@@ -1,5 +1,7 @@
 import logging
 
+LOG_FILE_NAME = "app.log"
+
 def setup_logger(name:str, log_file:str) -> logging.Logger:
     """Defines the logging setup"""
 
