@@ -1,13 +1,12 @@
 import requests
 from bs4 import BeautifulSoup
-from src.log import setup_logger
+from src.log import setup_logger, LOG_FILE_NAME
 
-logger = setup_logger("webscraping", "webscraping.log")
+logger = setup_logger("webscraping", LOG_FILE_NAME)
 
 
 def soup_html(url: str) -> BeautifulSoup:
     """Returns BeautifulSoup html object ready for parsing."""
-
     try:
         # retreive html and create soup object for parsing
         response = requests.get(url)
@@ -22,7 +21,6 @@ def soup_html(url: str) -> BeautifulSoup:
 
 def get_links_inside_table(url: str) -> list:
     """Returns a list of links in a table retreived from a BeautifulSoup object."""
-
     try:
         # find table and create list
         table = soup_html(url).find("table")
