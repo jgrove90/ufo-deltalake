@@ -1,6 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
-from src.log import setup_logger, LOG_FILE_NAME
+from utils import setup_logger, LOG_FILE_NAME
 
 logger = setup_logger("webscraping", LOG_FILE_NAME)
 
@@ -19,11 +19,11 @@ def soup_html(url: str) -> BeautifulSoup:
         logger.error(f"{e}")
 
 
-def get_links_inside_table(url: str) -> list:
+def get_links_inside_table(soup_html: BeautifulSoup) -> list:
     """Returns a list of links in a table retreived from a BeautifulSoup object."""
     try:
         # find table and create list
-        table = soup_html(url).find("table")
+        table = soup_html.find("table")
         link_list = [link.get("href") for link in table.find_all("a")]
 
         logger.info(f"Retreived {len(link_list)} links")
