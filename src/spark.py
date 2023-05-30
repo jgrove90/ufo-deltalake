@@ -96,3 +96,10 @@ def create_spark_dataframe(df: pd.DataFrame) -> DataFrame:
         logger.error(f"{e}")
 
 
+# TODO create test
+def load_to_table(df: DataFrame, table_path: str) -> None:
+    try:
+        df.write.format("delta").mode("overwrite").save(table_path)
+        logger.info(f"Spark dataframe written to {table_path}")
+    except Exception as e:
+        logger.error(f"{e}")
