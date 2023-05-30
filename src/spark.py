@@ -74,4 +74,14 @@ def ufo_bronze_table(spark_session: SparkSession, table_name: str) -> DeltaTable
         logger.error(f"{e}")
 
 
-extract_from_source(spark_session("ufo", "local[*]"), "ufo_bronze")
+# TODO create test
+def extract_html_table(url: str) -> pd.DataFrame:
+    """Extracts html tables from url"""
+    try:
+        df = read_html(url)
+        logger.info(f"Table extracted from f{url}")
+        return df[0]
+    except Exception as e:
+        logger.error(f"{e}")
+
+
