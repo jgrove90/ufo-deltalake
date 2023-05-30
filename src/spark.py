@@ -1,8 +1,9 @@
+from delta import DeltaTable
+import webscraper as ws
 from pyspark.sql import SparkSession
+from pyspark.sql.types import *
 from utils import setup_logger, LOG_FILE_NAME, get_package_version
 from importlib.metadata import version
-
-DATA_LAKE_PATH = "./data_lake"
 
 logger = setup_logger("spark_etl", LOG_FILE_NAME)
 
