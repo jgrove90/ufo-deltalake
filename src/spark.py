@@ -21,6 +21,7 @@ def spark_session(app_name: str, master: str) -> SparkSession:
                 "spark.sql.catalog.spark_catalog",
                 "org.apache.spark.sql.delta.catalog.DeltaCatalog",
             )
+            .config("fs.permissions.umask-mode", "007")
             .getOrCreate()
         )
 
