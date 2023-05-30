@@ -85,3 +85,14 @@ def extract_html_table(url: str) -> pd.DataFrame:
         logger.error(f"{e}")
 
 
+# TODO create test
+def create_spark_dataframe(df: pd.DataFrame) -> DataFrame:
+    """Converts pandas to spark dataframe"""
+    try:
+        spark_df = df.to_spark()
+        logger.info("Pandas dataframe converted to spark dataframe")
+        return spark_df
+    except Exception as e:
+        logger.error(f"{e}")
+
+
