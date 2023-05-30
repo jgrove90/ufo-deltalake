@@ -34,6 +34,8 @@ def spark_session(app_name: str, master: str) -> SparkSession:
     except Exception as e:
         logger.error(f"{e}")
 
+
+# TODO: Create test
 def ufo_bronze_table(spark_session: SparkSession, table_name: str) -> DeltaTable:
     """Creates a bronze ufo table"""
     try:
@@ -47,15 +49,15 @@ def ufo_bronze_table(spark_session: SparkSession, table_name: str) -> DeltaTable
             table = (
                 DeltaTable.createIfNotExists(spark_session)
                 .tableName(table_name)
-                .addColumn("timestamp", "STRING")
-                .addColumn("city", "STRING")
-                .addColumn("state", "STRING")
-                .addColumn("country", "STRING")
-                .addColumn("shape", "STRING")
-                .addColumn("duration", "STRING")
-                .addColumn("summary", "STRING")
-                .addColumn("posted", "STRING")
-                .addColumn("images", "STRING")
+                .addColumn("DateTime", "STRING")
+                .addColumn("City", "STRING")
+                .addColumn("State", "STRING")
+                .addColumn("Country", "STRING")
+                .addColumn("Shape", "STRING")
+                .addColumn("Duration", "STRING")
+                .addColumn("Summary", "STRING")
+                .addColumn("Posted", "STRING")
+                .addColumn("Images", "STRING")
                 .location(f".{path}")
                 .execute()
             )
