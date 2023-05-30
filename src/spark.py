@@ -1,13 +1,16 @@
 from delta import DeltaTable
 import webscraper as ws
-from pyspark.sql import SparkSession
+from pyspark.sql import SparkSession, DataFrame
 from pyspark.sql.types import *
+from pyspark.pandas import read_html, DataFrame
 from utils import setup_logger, LOG_FILE_NAME, get_package_version
 from importlib.metadata import version
+import pandas as pd
 
 logger = setup_logger("spark_etl", LOG_FILE_NAME)
 
 
+# TODO: Create test
 def spark_session(app_name: str, master: str) -> SparkSession:
     """Creates a SparkSession"""
     try:
