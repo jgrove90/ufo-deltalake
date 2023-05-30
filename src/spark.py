@@ -33,16 +33,37 @@ def spark_session(app_name: str, master: str) -> SparkSession:
     except Exception as e:
         logger.error(f"{e}")
 
-
-# FIXME: edit this extract method to
-def extract_from_source(spark_session: SparkSession, folder: str):
-    """Extracts data from source"""
+def ufo_bronze_table(spark_session: SparkSession, table_name: str) -> DeltaTable:
+    """Creates a bronze ufo table"""
     try:
-        df = spark_session.range(0, 10)
+        path = "/ufo/bronze"
 
-        df.write.format("delta").mode("overwrite").save(f"{DATA_LAKE_PATH}/{folder}")
+        if DeltaTable.isDeltaTable(spark_session, f"./spark-warehouse{path}"):
+            logger.info(
+                f"Delta table: '{table_name}' already exists at './spark-warehouse{path}'"
+            )
+        else:
+            table = (
+                DeltaTable.createIfNotExists(spark_session)
+                .tableName(table_name)
+                .addColumn("timestamp", "STRING")
+                .addColumn("city", "STRING")
+                .addColumn("state", "STRING")
+                .addColumn("country", "STRING")
+                .addColumn("shape", "STRING")
+                .addColumn("duration", "STRING")
+                .addColumn("summary", "STRING")
+                .addColumn("posted", "STRING")
+                .addColumn("images", "STRING")
+                .location(f".{path}")
+                .execute()
+            )
 
-        logger.info(f"Extracted successfully from ________.")
+            logger.info(
+                f"Created delta table: {table_name} located at './spark-warehouse{path}'"
+            )
+
+            return table
     except Exception as e:
         logger.error(f"{e}")
 
