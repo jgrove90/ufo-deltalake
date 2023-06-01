@@ -330,7 +330,7 @@ services:
         - ./spark/resources:/opt/spark/resources # Resources (same path in airflow and spark)
 
   # python dev enviroment
-  deltalake:
+  python:
     image: python_dev_env
     build:
       context: .
@@ -338,7 +338,7 @@ services:
     ports:
       - 8888:8888
     volumes:
-      - .:/opt/deltalake_stack
+      - .:/opt/python_dev_env
 
 volumes:
   postgres-db-volume:
