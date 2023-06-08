@@ -21,7 +21,7 @@ services:
       - 7077:7077
     volumes:
       - ./lakehouse:/opt/bitnami/spark/data
-      - ./src/spark/logs:/opt/bitnami/spark/logs
+      - ./logs/spark:/opt/bitnami/spark/logs
 
   spark-worker:
     image: bitnami/spark:latest
@@ -47,7 +47,7 @@ services:
       - 4040:4040
     volumes:
       - ./lakehouse:/opt/bitnami/spark/data
-      - ./src/spark/logs:/opt/bitnami/spark/logs
+      - ./logs/spark:/opt/bitnami/spark/logs
 
   spark-history-server:
     image: bitnami/spark:latest
@@ -63,7 +63,7 @@ services:
       - 18080:18080
     volumes:
       - ./lakehouse:/opt/bitnami/spark/data
-      - ./src/spark/logs:/opt/bitnami/spark/logs
+      - ./logs/spark:/opt/bitnami/spark/logs
     command: >
       bash -c "/opt/bitnami/spark/sbin/start-history-server.sh"
 
