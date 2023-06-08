@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 import ephem
 
 # set log file name for app
-LOG_FILE_NAME = "app.log"
+LOG_FILE_NAME = "./logs/app.log"
 
 
 def get_package_version(package_name: str) -> str:
