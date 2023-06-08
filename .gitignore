@@ -153,13 +153,15 @@ dmypy.json
 cython_debug/
 
 # data folders
-/spark-warehouse
+/lakehouse
 
 # html test files
 *.html
 
 # vscode
 .vscode
+
+/src/spark/logs/*
 
 # PyCharm
 #  JetBrains specific template is maintained in a separate JetBrains.gitignore that can
