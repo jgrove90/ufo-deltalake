@@ -20,12 +20,8 @@ services:
       - 8080:8080
       - 7077:7077
     volumes:
-      - ./spark-warehouse:/opt/bitnami/spark/data
+      - ./lakehouse:/opt/bitnami/spark/data
       - ./src/spark/logs:/opt/bitnami/spark/logs
-      - ./src/spark/conf:/opt/spark_reqs/conf
-      - ./src/spark/jars:/opt/spark_reqs/jars
-    command: >
-      bash -c "cp -p /opt/spark_reqs/conf/spark-defaults.conf /opt/bitnami/spark/conf && cp -p /opt/spark_reqs/jars/delta-core_2.12-2.4.0.jar /opt/bitnami/spark/jars && /opt/bitnami/spark/sbin/start-master.sh"
 
   spark-worker:
     image: bitnami/spark:latest
@@ -50,12 +46,8 @@ services:
     ports:
       - 4040:4040
     volumes:
-      - ./spark-warehouse:/opt/bitnami/spark/data
+      - ./lakehouse:/opt/bitnami/spark/data
       - ./src/spark/logs:/opt/bitnami/spark/logs
-      - ./src/spark/conf:/opt/spark_reqs/conf
-      - ./src/spark/jars:/opt/spark_reqs/jars
-    command: >
-      bash -c "cp -p /opt/spark_reqs/conf/spark-defaults.conf /opt/bitnami/spark/conf && cp -p /opt/spark_reqs/jars/delta-core_2.12-2.4.0.jar /opt/bitnami/spark/jars && /opt/bitnami/spark/sbin/start-worker.sh spark://spark-master:7077"
 
   spark-history-server:
     image: bitnami/spark:latest
@@ -70,18 +62,16 @@ services:
     ports:
       - 18080:18080
     volumes:
-      - ./spark-warehouse:/opt/bitnami/spark/data
+      - ./lakehouse:/opt/bitnami/spark/data
       - ./src/spark/logs:/opt/bitnami/spark/logs
-      - ./src/spark/conf:/opt/spark_reqs/conf
-      - ./src/spark/jars:/opt/spark_reqs/jars
     command: >
-      bash -c "cp /opt/spark_reqs/conf/spark-defaults.conf /opt/bitnami/spark/conf && cp /opt/spark_reqs/jars/delta-core_2.12-2.4.0.jar /opt/bitnami/spark/jars && /opt/bitnami/spark/sbin/start-history-server.sh"
+      bash -c "/opt/bitnami/spark/sbin/start-history-server.sh"
 
   # python dev enviroment
   python:
     image: python3.10.6
-    container_name: python3.10.6
-    hostname: python3.10.6
+    container_name: python_app
+    hostname: python_app
     build:
       context: .
       dockerfile: ./Dockerfile
