@@ -1,58 +1,87 @@
-version: '3.8'  
+version: '3.8'
 services:
-  # spark stack
   spark-master:
-    image: bitnami/spark:3.4.0
-    user: root # Run container as root container: https://docs.bitnami.com/tutorials/work-with-non-root-containers/
+    image: bitnami/spark:latest
+    container_name: spark-master
     hostname: spark-master
-    ports:
-        - 8081:8080
-        - 7077:7077
-        - 4040:4040
+    user: root
     environment:
-        - SPARK_MODE=master
-        - SPARK_RPC_AUTHENTICATION_ENABLED=no
-        - SPARK_RPC_ENCRYPTION_ENABLED=no
-        - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
-        - SPARK_SSL_ENABLED=no
+      - SPARK_MODE=master
+      - SPARK_MASTER_HOST=spark-master
+      - SPARK_MASTER_PORT=7077
+      - SPARK_MASTER_WEBUI_PORT=8080
+      - SPARK_CONF_DIR=/opt/bitnami/spark/conf
+      - SPARK_EVENTLOG_ENABLED=true
+      - SPARK_EVENTLOG_DIR=/opt/bitnami/spark/logs
+      - SPARK_HISTORY_OPTS=-Dspark.history.fs.logDirectory=file:/opt/bitnami/spark/logs
+      - SPARK_SQL_EXTENSIONS=io.delta.sql.DeltaSparkSessionExtension
+      - SPARK_SQL_CATALOG_IMPLEMENTATION=io.delta.sql.DeltaCatalog
+    ports:
+      - 8080:8080
+      - 7077:7077
     volumes:
-        - ./src/spark/app:/opt/src/spark/app # Scripts (same path in airflow and spark)
-        - ./src/spark/resources:/opt/src/spark/resources # Resources (same path in airflow and spark)
+      - ./spark-warehouse:/opt/bitnami/spark/data
+      - ./src/spark/logs:/opt/bitnami/spark/logs
+      - ./src/spark/conf:/opt/spark_reqs/conf
+      - ./src/spark/jars:/opt/spark_reqs/jars
+    command: >
+      bash -c "cp -p /opt/spark_reqs/conf/spark-defaults.conf /opt/bitnami/spark/conf && cp -p /opt/spark_reqs/jars/delta-core_2.12-2.4.0.jar /opt/bitnami/spark/jars && /opt/bitnami/spark/sbin/start-master.sh"
 
   spark-worker:
-    image: bitnami/spark:3.4.0
+    image: bitnami/spark:latest
+    container_name: spark-worker
+    hostname: spark-worker
     user: root
-    environment:
-        - SPARK_MODE=worker
-        - SPARK_MASTER_URL=spark://spark-master:7077
-        - SPARK_WORKER_MEMORY=3G
-        - SPARK_WORKER_CORES=12
-        - SPARK_RPC_AUTHENTICATION_ENABLED=no
-        - SPARK_RPC_ENCRYPTION_ENABLED=no
-        - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
-        - SPARK_SSL_ENABLED=no
     depends_on:
       - spark-master
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER=spark://spark-master:7077
+      - SPARK_CONF_DIR=/opt/bitnami/spark/conf
+      - SPARK_EVENTLOG_ENABLED=true
+      - SPARK_EVENTLOG_DIR=/opt/bitnami/spark/logs
+      - SPARK_HISTORY_OPTS=-Dspark.history.fs.logDirectory=file:/opt/bitnami/spark/logs
+      - SPARK_SQL_EXTENSIONS=io.delta.sql.DeltaSparkSessionExtension
+      - SPARK_SQL_CATALOG_IMPLEMENTATION=io.delta.sql.DeltaCatalog
+      - SPARK_DRIVER_MEMORY=4g
+      - SPARK_EXECUTOR_MEMORY=4g
+      - SPARK_DRIVER_CORES=3
+      - SPARK_EXECUTOR_CORES=10
+    ports:
+      - 4040:4040
     volumes:
-        - ./src/spark/app:/opt/spark/app # Scripts (same path in airflow and spark)
-        - ./src/spark/resources:/opt/spark/resources # Resources (same path in airflow and spark)
-#TODO: Add user permissions
+      - ./spark-warehouse:/opt/bitnami/spark/data
+      - ./src/spark/logs:/opt/bitnami/spark/logs
+      - ./src/spark/conf:/opt/spark_reqs/conf
+      - ./src/spark/jars:/opt/spark_reqs/jars
+    command: >
+      bash -c "cp -p /opt/spark_reqs/conf/spark-defaults.conf /opt/bitnami/spark/conf && cp -p /opt/spark_reqs/jars/delta-core_2.12-2.4.0.jar /opt/bitnami/spark/jars && /opt/bitnami/spark/sbin/start-worker.sh spark://spark-master:7077"
+
   spark-history-server:
-    image: bitnami/spark:3.4.0
+    image: bitnami/spark:latest
+    container_name: spark-history-server
+    hostname: spark-history-server
     user: root
+    depends_on:
+      - spark-master
+    environment:
+      - SPARK_HISTORY_OPTS=-Dspark.history.fs.logDirectory=file:/opt/bitnami/spark/logs
+      - SPARK_CONF_DIR=/opt/bitnami/spark/conf
     ports:
       - 18080:18080
-    environment:
-      - SPARK_HISTORY_OPTS=-Dspark.history.fs.logDirectory=/opt/spark/resources/logs
     volumes:
-      - ./src/spark/resources/logs:/opt/spark/resources/logs
+      - ./spark-warehouse:/opt/bitnami/spark/data
+      - ./src/spark/logs:/opt/bitnami/spark/logs
+      - ./src/spark/conf:/opt/spark_reqs/conf
+      - ./src/spark/jars:/opt/spark_reqs/jars
     command: >
-      bash -c "/opt/bitnami/spark/sbin/start-history-server.sh"
-
+      bash -c "cp /opt/spark_reqs/conf/spark-defaults.conf /opt/bitnami/spark/conf && cp /opt/spark_reqs/jars/delta-core_2.12-2.4.0.jar /opt/bitnami/spark/jars && /opt/bitnami/spark/sbin/start-history-server.sh"
 
   # python dev enviroment
   python:
     image: python3.10.6
+    container_name: python3.10.6
+    hostname: python3.10.6
     build:
       context: .
       dockerfile: ./Dockerfile
