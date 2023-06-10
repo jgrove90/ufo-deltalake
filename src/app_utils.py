@@ -91,6 +91,12 @@ def get_moon_phase(date):
         float: The phase angle of the Moon, rounded to two decimal places.
     """
     try:
+        # Validate the year
+        if len(str(date)) == 10:
+            year = int(str(date)[:4])
+            if year < 1900 or year > 2100:
+                return None
+            
         # Convert date to ephem format
         ephem_date = ephem.Date(date)
 
@@ -103,4 +109,5 @@ def get_moon_phase(date):
     except Exception as e:
         logger = setup_logger("utils", LOG_FILE_NAME)
         logger.error(f"{e}")
+        return None
 

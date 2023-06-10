@@ -48,7 +48,7 @@ def delta_vacuum(spark: SparkSession, table_path: str, retention: int) -> DataFr
         logger.error(f"{e}")
 
 
-def load_source_data(spark: SparkSession, df: DataFrame, table_path: str) -> DataFrame:
+def load_data(spark: SparkSession, df: DataFrame, table_path: str) -> DataFrame:
     """Loads source data into delta table"""
     try:
         df.write.format("delta").mode("overwrite").save(table_path)
