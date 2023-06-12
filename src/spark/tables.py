@@ -8,7 +8,21 @@ logger = setup_logger("tables", LOG_FILE_NAME)
 
 # TODO: Create test
 def create_ufo_bronze_table(spark: SparkSession, table_name: str) -> DeltaTable:
-    """Creates a bronze ufo table"""
+    """
+    Creates a bronze UFO table.
+
+    Args:
+        spark (SparkSession): The SparkSession object for interacting with Spark.
+        table_name (str): The name of the table to create.
+
+    Returns:
+        DeltaTable: The DeltaTable object representing the created table.
+        If the table already exists, None is returned.
+
+    Note:
+        The function assumes that the path for the bronze table
+        is './lakehouse/ufo/bronze'.
+    """
     try:
         path = "./lakehouse/ufo/bronze"
 
@@ -39,7 +53,21 @@ def create_ufo_bronze_table(spark: SparkSession, table_name: str) -> DeltaTable:
 
 
 def create_ufo_silver_table(spark: SparkSession, table_name: str) -> DeltaTable:
-    """Creates a silver ufo table"""
+    """
+    Creates a silver UFO table.
+
+    Args:
+        spark (SparkSession): The SparkSession object for interacting with Spark.
+        table_name (str): The name of the table to create.
+
+    Returns:
+        DeltaTable: The DeltaTable object representing the created table.
+        If the table already exists, None is returned.
+
+    Note:
+        The function assumes that the path for the silver table
+        is './lakehouse/ufo/silver'.
+    """
     try:
         path = "./lakehouse/ufo/silver"
 
@@ -78,8 +106,24 @@ def create_ufo_silver_table(spark: SparkSession, table_name: str) -> DeltaTable:
     except Exception as e:
         logger.error(f"{e}")
 
+
 def create_ufo_gold_dim_location(spark: SparkSession, table_name: str) -> DeltaTable:
-    """Creates dimension location"""
+    """
+    Creates the dimension location table for the gold layer.
+
+    Args:
+        spark (SparkSession): The SparkSession object for interacting with Spark.
+        table_name (str): The name of the table to create.
+
+    Returns:
+        DeltaTable: The DeltaTable object representing the created table.
+        If the table already exists, None is returned.
+
+    Note:
+        The function assumes that the path for the dimension location table
+        is './lakehouse/ufo/gold/dim_location'.
+
+    """
     try:
         path = "./lakehouse/ufo/gold/dim_location"
 
@@ -103,8 +147,23 @@ def create_ufo_gold_dim_location(spark: SparkSession, table_name: str) -> DeltaT
     except Exception as e:
         logger.error(f"{e}")
 
+
 def create_ufo_gold_dim_description(spark: SparkSession, table_name: str) -> DeltaTable:
-    """Creates dimension description"""
+    """
+    Creates the dimension description table for the gold layer.
+
+    Args:
+        spark (SparkSession): The SparkSession object for interacting with Spark.
+        table_name (str): The name of the table to create.
+
+    Returns:
+        DeltaTable: The DeltaTable object representing the created table.
+        If the table already exists, None is returned.
+
+    Note:
+        The function assumes that the path for the dimension description table
+        is './lakehouse/ufo/gold/dim_description'.
+    """
     try:
         path = "./lakehouse/ufo/gold/dim_description"
 
@@ -128,8 +187,24 @@ def create_ufo_gold_dim_description(spark: SparkSession, table_name: str) -> Del
     except Exception as e:
         logger.error(f"{e}")
 
+
 def create_ufo_gold_dim_date(spark: SparkSession, table_name: str) -> DeltaTable:
-    """Creates dimension date"""
+    """
+    Creates the dimension date table for the gold layer.
+
+    Args:
+        spark (SparkSession): The SparkSession object for interacting with Spark.
+        table_name (str): The name of the table to create.
+
+    Returns:
+        DeltaTable: The DeltaTable object representing the created table.
+        If the table already exists, None is returned.
+
+    Note:
+        The function assumes that the path for the dimension date table
+        is './lakehouse/ufo/gold/dim_date'.
+    """
+
     try:
         path = "./lakehouse/ufo/gold/dim_date"
 
@@ -155,8 +230,23 @@ def create_ufo_gold_dim_date(spark: SparkSession, table_name: str) -> DeltaTable
     except Exception as e:
         logger.error(f"{e}")
 
+
 def create_ufo_gold_dim_astro(spark: SparkSession, table_name: str) -> DeltaTable:
-    """Creates dimension astro"""
+    """
+    Creates the dimension astro table for the gold layer.
+
+    Args:
+        spark (SparkSession): The SparkSession object for interacting with Spark.
+        table_name (str): The name of the table to create.
+
+    Returns:
+        DeltaTable: The DeltaTable object representing the created table.
+        If the table already exists, None is returned.
+
+    Note:
+        The function assumes that the path for the dimension astro table
+        is './lakehouse/ufo/gold/dim_astro'.
+    """
     try:
         path = "./lakehouse/ufo/gold/dim_astro"
 
@@ -177,8 +267,23 @@ def create_ufo_gold_dim_astro(spark: SparkSession, table_name: str) -> DeltaTabl
     except Exception as e:
         logger.error(f"{e}")
 
+
 def create_ufo_gold_fact(spark: SparkSession, table_name: str) -> DeltaTable:
-    """Creates dimension fact"""
+    """
+    Creates the fact table for the gold layer.
+
+    Args:
+        spark (SparkSession): The SparkSession object for interacting with Spark.
+        table_name (str): The name of the table to create.
+
+    Returns:
+        DeltaTable: The DeltaTable object representing the created table.
+        If the table already exists, None is returned.
+
+    Note:
+        The function assumes that the path for the fact table
+        is './lakehouse/ufo/gold/fact'.
+    """
     try:
         path = "./lakehouse/ufo/gold/fact"
 

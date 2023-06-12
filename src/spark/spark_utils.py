@@ -7,7 +7,16 @@ logger = setup_logger("spark_utils", LOG_FILE_NAME)
 
 
 def spark_session() -> SparkSession:
-    """Creates a SparkSession"""
+    """
+    Creates a SparkSession object for interacting with Spark.
+
+    Returns:
+        SparkSession: The SparkSession object.
+
+    Note:
+        The function assumes that the necessary files for distribution
+        are located at './src/app_utils.py' and './src/address_cleaning.py'.
+    """
     try:
         delta_version = get_package_version("delta-spark")
 
@@ -27,7 +36,16 @@ def spark_session() -> SparkSession:
 
 
 def optimize_table(spark: SparkSession, table_path: str) -> DataFrame:
-    """Coalesces small files into larger ones"""
+    """
+    Coalesces small files into larger ones.
+
+    Args:
+        spark (SparkSession): The SparkSession object.
+        table_path (str): The path to the Delta table.
+
+    Returns:
+        DeltaTable: The optimized DeltaTable object.
+    """
     try:
         deltatable = (
             DeltaTable.forPath(spark, table_path).optimize().executeCompaction()
@@ -39,7 +57,16 @@ def optimize_table(spark: SparkSession, table_path: str) -> DataFrame:
 
 
 def delta_vacuum(spark: SparkSession, table_path: str, retention: int) -> DataFrame:
-    """Removes old files based on retention period"""
+    """Removes old files based on retention period.
+
+    Args:
+        spark (SparkSession): The SparkSession object.
+        table_path (str): The path to the Delta table.
+        retention (int): The retention period in hours.
+
+    Returns:
+        DeltaTable: The vacuumed DeltaTable object.
+    """
     try:
         deltaTable = DeltaTable.forPath(spark, table_path)
         logger.info(f"Vacuuming data after optimization @ {table_path}")
@@ -49,7 +76,16 @@ def delta_vacuum(spark: SparkSession, table_path: str, retention: int) -> DataFr
 
 
 def load_data(spark: SparkSession, df: DataFrame, table_path: str) -> DataFrame:
-    """Loads source data into delta table"""
+    """Loads source data into Delta table.
+
+    Args:
+        spark (SparkSession): The SparkSession object.
+        df (DataFrame): The DataFrame containing the data to be loaded.
+        table_path (str): The path to the Delta table.
+
+    Returns:
+        DeltaTable: The DeltaTable object after loading the data.
+    """
     try:
         df.write.format("delta").mode("overwrite").save(table_path)
         logger.info(f"Data successfully loaded into delta lake @ {table_path}")

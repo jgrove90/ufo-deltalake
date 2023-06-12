@@ -12,6 +12,17 @@ cache = {}
 @sleep_and_retry
 @limits(calls=1, period=1)
 def clean_address(address) -> tuple:
+    """
+    Clean and geocode an address.
+
+    Args:
+        address (str): The address to clean and geocode.
+
+    Returns:
+        tuple: A tuple containing the cleaned address components 
+               - city, state, country, latitude, longitude.
+               If the address could not be geocoded or an exception occurs, it returns None.
+    """
     try:
         if address in cache:
             return cache[address]

@@ -1,13 +1,20 @@
 from spark.tables import *
 from spark.transformations import *
-from spark.spark_utils import spark_session,  load_data
+from spark.spark_utils import spark_session, load_data
 from spark.ufo_scraper import scrape_ufo_data
 from pyspark.sql import SparkSession
 
 
 def create_delta_tables(spark: SparkSession) -> None:
-    """Creates bronze tables for initial data extraction"""
+    """
+    Creates tables for data.
 
+    Args:
+        spark (SparkSession): The Spark session.
+
+    Returns:
+        None
+    """
     create_ufo_bronze_table(spark, "ufo_bronze")
     create_ufo_silver_table(spark, "ufo_silver")
     create_ufo_gold_dim_location(spark, "ufo_gold_dim_location")
@@ -17,30 +24,48 @@ def create_delta_tables(spark: SparkSession) -> None:
     create_ufo_gold_fact(spark, "ufo_gold_fact")
 
 
-
 def table_transformations(spark: SparkSession) -> list[DeltaTable]:
-    """Performs table transformations"""
+    """
+    Perform table transformations.
 
-    tables = [ufo_silver_transform(spark), 
-              ufo_gold_location_transform(spark),
-              ufo_gold_description_transform(spark),
-              ufo_gold_date_transform(spark),
-              ufo_gold_astro_transform(spark),
-              ufo_gold_fact_transform(spark),]
-    
-  
+    Args:
+        spark (SparkSession): The Spark session.
+
+    Returns:
+        list[DeltaTable]: List of DeltaTable objects representing the transformed tables.
+    """
+    tables = [
+        ufo_silver_transform(spark),
+        ufo_gold_location_transform(spark),
+        ufo_gold_description_transform(spark),
+        ufo_gold_date_transform(spark),
+        ufo_gold_astro_transform(spark),
+        ufo_gold_fact_transform(spark),
+    ]
+
     return tables
 
 
 def load_tables(spark: SparkSession, tables: list[DeltaTable]) -> None:
+    """
+    Load tables into Delta Lake.
 
+    Args:
+        spark (SparkSession): The Spark session.
+        tables (list[DeltaTable]): List of DeltaTable objects representing the tables to load.
+
+    Returns:
+        None
+    """
     # must be the same order as the transformations
-    paths = ["./lakehouse/ufo/silver",
-             "./lakehouse/ufo/gold/dim_location",
-             "./lakehouse/ufo/gold/dim_description",
-             "./lakehouse/ufo/gold/dim_date",
-             "./lakehouse/ufo/gold/dim_astro",
-             "./lakehouse/ufo/gold/fact",]
+    paths = [
+        "./lakehouse/ufo/silver",
+        "./lakehouse/ufo/gold/dim_location",
+        "./lakehouse/ufo/gold/dim_description",
+        "./lakehouse/ufo/gold/dim_date",
+        "./lakehouse/ufo/gold/dim_astro",
+        "./lakehouse/ufo/gold/fact",
+    ]
 
     for table, path in zip(tables, paths):
         load_data(spark, table, path)

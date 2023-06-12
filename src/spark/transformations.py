@@ -8,7 +8,16 @@ logger = setup_logger("transformations", LOG_FILE_NAME)
 
 
 def ufo_silver_transform(spark: SparkSession) -> DataFrame:
-    """Performs transformations for the silver layer"""
+    """
+    Performs transformations for the silver layer.
+
+    Args:
+        spark (SparkSession): The SparkSession object for interacting with Spark.
+
+    Returns:
+        DataFrame: A DataFrame containing the transformed silver layer data.
+        If an exception occurs, it returns None.
+    """
     try:
         # register the get_moon_phase() function as a UDF
         get_moon_phase_udf = udf(get_moon_phase)
@@ -37,7 +46,7 @@ def ufo_silver_transform(spark: SparkSession) -> DataFrame:
             .withColumnRenamed("State", "state")
             .withColumnRenamed("Country", "country")
             .withColumnRenamed("Images", "images")
-            # add hour 00:00 to the dates missing a time
+            # add hour 00:00 to the dates missing a time, take note of this in analysis
             .withColumn(
                 "DateTime",
                 when(
@@ -105,7 +114,16 @@ def ufo_silver_transform(spark: SparkSession) -> DataFrame:
 
 
 def ufo_gold_location_transform(spark: SparkSession) -> DataFrame:
-    """Performs transformations for dim location"""
+    """
+    Performs transformations for the dim_location table in the gold layer.
+
+    Args:
+        spark (SparkSession): The SparkSession object for interacting with Spark.
+
+    Returns:
+        DataFrame: A DataFrame containing the transformed dim_location data.
+        If an exception occurs, it returns None.
+    """
     try:
         df = spark.read.format("delta").load("./lakehouse/ufo/silver")
 
@@ -126,7 +144,16 @@ def ufo_gold_location_transform(spark: SparkSession) -> DataFrame:
 
 
 def ufo_gold_description_transform(spark: SparkSession) -> DataFrame:
-    """Performs transformations for dim description"""
+    """
+    Performs transformations for the dim_description table in the gold layer.
+
+    Args:
+        spark (SparkSession): The SparkSession object for interacting with Spark.
+
+    Returns:
+        DataFrame: A DataFrame containing the transformed dim_description data.
+        If an exception occurs, it returns None.
+    """
     try:
         df = spark.read.format("delta").load("./lakehouse/ufo/silver")
 
@@ -146,8 +173,18 @@ def ufo_gold_description_transform(spark: SparkSession) -> DataFrame:
     except Exception as e:
         logger.error(f"{e}")
 
+
 def ufo_gold_date_transform(spark: SparkSession) -> DataFrame:
-    """Performs transformations for dim date"""
+    """
+    Performs transformations for the dim_transform table in the gold layer.
+
+    Args:
+        spark (SparkSession): The SparkSession object for interacting with Spark.
+
+    Returns:
+        DataFrame: A DataFrame containing the transformed dim_transform data.
+        If an exception occurs, it returns None.
+    """
     try:
         df = spark.read.format("delta").load("./lakehouse/ufo/silver")
 
@@ -169,8 +206,18 @@ def ufo_gold_date_transform(spark: SparkSession) -> DataFrame:
     except Exception as e:
         logger.error(f"{e}")
 
+
 def ufo_gold_astro_transform(spark: SparkSession) -> DataFrame:
-    """Performs transformations for dim date"""
+    """
+    Performs transformations for the dim_astro_transform table in the gold layer.
+
+    Args:
+        spark (SparkSession): The SparkSession object for interacting with Spark.
+
+    Returns:
+        DataFrame: A DataFrame containing the transformed dim_astro_transform data.
+        If an exception occurs, it returns None.
+    """
     try:
         df = spark.read.format("delta").load("./lakehouse/ufo/silver")
 
@@ -187,18 +234,26 @@ def ufo_gold_astro_transform(spark: SparkSession) -> DataFrame:
     except Exception as e:
         logger.error(f"{e}")
 
+
 def ufo_gold_fact_transform(spark: SparkSession) -> DataFrame:
-    """Performs transformations for dim date"""
+    """
+    Performs transformations for the fact_transform table in the gold layer.
+
+    Args:
+        spark (SparkSession): The SparkSession object for interacting with Spark.
+
+    Returns:
+        DataFrame: A DataFrame containing the transformed fact_transform data.
+        If an exception occurs, it returns None.
+    """
     try:
         df = spark.read.format("delta").load("./lakehouse/ufo/silver")
 
-        df = (
-            df.select(
-                "id_location",
-                "id_description",
-                "id_date",
-                "id_astro",
-            )
+        df = df.select(
+            "id_location",
+            "id_description",
+            "id_date",
+            "id_astro",
         )
         logger.info(f"Gold layer transformation for fact completed")
         return df

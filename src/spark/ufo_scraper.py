@@ -13,7 +13,16 @@ logger = setup_logger("ufo_scraper", LOG_FILE_NAME)
 
 
 def get_links_inside_table(soup_html: BeautifulSoup) -> list:
-    """Returns a list of links in a table retreived from a BeautifulSoup object."""
+    """
+    Retrieve links from a table in a BeautifulSoup object.
+
+    Args:
+        soup_html (BeautifulSoup): The BeautifulSoup object containing the HTML.
+
+    Returns:
+        list: A list of links found inside the table. 
+        If no table is found or an exception occurs, it returns an empty list.
+    """
     try:
         # find table and create list
         table = soup_html.find("table")
@@ -27,7 +36,17 @@ def get_links_inside_table(soup_html: BeautifulSoup) -> list:
 
 
 def scrape_ufo_data(url: str) -> DataFrame:
-    """Extracts ufo data from website"""
+    """
+    Scrape UFO data from a website and return a DataFrame.
+
+    Args:
+        url (str): The URL of the website to scrape the data from.
+
+    Returns:
+        DataFrame: A DataFrame containing the scraped UFO data. 
+        If an exception occurs, it returns None.
+    """
+
     try:
         df_list = []
         counter = 0
