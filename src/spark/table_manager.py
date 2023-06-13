@@ -4,15 +4,6 @@ from pyspark.sql import DataFrame
 
 logger = setup_logger("table_manager", LOG_FILE_NAME)
 
-table_paths = {
-    "bronze": "/opt/ufo-lakehouse/lakehouse/ufo/bronze",
-    "silver": "/opt/ufo-lakehouse/lakehouse/ufo/silver",
-    "dim_location": "/opt/ufo-lakehouse/lakehouse/ufo/gold/dim_location",
-    "dim_description": "/opt/ufo-lakehouse/lakehouse/ufo/gold/dim_description",
-    "dim_date": "/opt/ufo-lakehouse/lakehouse/ufo/gold/dim_date",
-    "dim_astro": "/opt/ufo-lakehouse/lakehouse/ufo/gold/dim_astro",
-    "fact": "/opt/ufo-lakehouse//lakehouse/ufo/gold/fact",
-}
 
 class TableManager:
     def __init__(self, spark):
@@ -75,7 +66,8 @@ class TableManager:
             logger.error(f"{e}")
 
     def create_table(
-        self, table_name: str, columns: list, table_path: str) -> DeltaTable:
+        self, table_name: str, columns: list, table_path: str
+    ) -> DeltaTable:
         """
         Creates a Delta table with the specified table name, columns, and path.
 
