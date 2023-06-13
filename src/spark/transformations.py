@@ -7,6 +7,7 @@ from spark.table_schema import TABLE_PATHS
 
 logger = setup_logger("transformations", LOG_FILE_NAME)
 
+
 class Transformation:
     def __init__(self, spark):
         self.spark = spark
@@ -26,25 +27,28 @@ class Transformation:
             # register the get_moon_phase() function as a UDF
             get_moon_phase_udf = udf(get_moon_phase)
 
-            df = self.spark.read.format("delta").load(TABLE_PATHS.get('bronze'))
-
+            # columns for window functions
+            loc_columns = ["city", "state", "country",]
+            desc_columns = ["shape", "duration", "summary", "images",]
+            date_columns = ["date", "year", "dayOfWeek", "week", "hour",]
+        
             # windows
-            location_window = Window.orderBy("city", "state", "country")
-            description_window = Window.orderBy("shape", "duration", "summary", "images")
-            date_window = Window.orderBy(
-                "date",
-                "year",
-                "dayOfWeek",
-                "week",
-                "hour",
-            )
+            location_window = Window.orderBy(loc_columns)
+            description_window = Window.orderBy(desc_columns)
+            date_window = Window.orderBy(date_columns)
             astro_window = Window.orderBy("moonPhaseAngle")
+ 
 
             df = (
+                self.spark.read.format("delta")
+                .load(TABLE_PATHS.get("bronze"))
                 # filter for USA
-                df.filter(df.Country == "USA")
+                .filter(col("Country") == "USA")
                 # change null value to No
-                .withColumn("Images", when(df.Images.isNull(), "No").otherwise(df.Images))
+                .withColumn(
+                    "Images",
+                    when(col("Images").isNull(), "No").otherwise(col("Images")),
+                )
                 # rename the coulmns
                 .withColumnRenamed("City", "city")
                 .withColumnRenamed("State", "state")
@@ -68,7 +72,12 @@ class Transformation:
                 .withColumn("week", weekofyear("date"))
                 .withColumn("hour", hour("timestamp"))
                 # select dates that have correct format
-                .where(((length(trim(df.DateTime)) > 6) | (length(trim(df.DateTime)) < 13)))
+                .where(
+                    (
+                        (length(trim(col("DateTime"))) > 6)
+                        | (length(trim(col("DateTime"))) < 13)
+                    )
+                )
                 .where(length(col("year")) == 4)
                 .where(col("year") <= datetime.today().year)
                 # call the moon_phase_udf
@@ -81,7 +90,9 @@ class Transformation:
                 .withColumn(
                     "id", row_number().over(Window.orderBy(asc("date"))).cast("long")
                 )
-                .withColumn("id_location", dense_rank().over(location_window).cast("long"))
+                .withColumn(
+                    "id_location", dense_rank().over(location_window).cast("long")
+                )
                 .withColumn(
                     "id_description", dense_rank().over(description_window).cast("long")
                 )
@@ -116,7 +127,6 @@ class Transformation:
         except Exception as e:
             logger.error(f"{e}")
 
-
     def ufo_gold_location(self) -> DataFrame:
         """
         Performs transformations for the dim_location table in the gold layer.
@@ -129,10 +139,10 @@ class Transformation:
             If an exception occurs, it returns None.
         """
         try:
-            df = self.spark.read.format("delta").load(TABLE_PATHS.get('silver'))
-
             df = (
-                df.select(
+                self.spark.read.format("delta")
+                .load(TABLE_PATHS.get("silver"))
+                .select(
                     "id_location",
                     "city",
                     "state",
@@ -146,7 +156,6 @@ class Transformation:
         except Exception as e:
             logger.error(f"{e}")
 
-
     def ufo_gold_description(self) -> DataFrame:
         """
         Performs transformations for the dim_description table in the gold layer.
@@ -159,10 +168,10 @@ class Transformation:
             If an exception occurs, it returns None.
         """
         try:
-            df = self.spark.read.format("delta").load(TABLE_PATHS.get('silver'))
-
             df = (
-                df.select(
+                self.spark.read.format("delta")
+                .load(TABLE_PATHS.get("silver"))
+                .select(
                     "id_description",
                     "shape",
                     "duration",
@@ -177,7 +186,6 @@ class Transformation:
         except Exception as e:
             logger.error(f"{e}")
 
-
     def ufo_gold_date(self) -> DataFrame:
         """
         Performs transformations for the dim_transform table in the gold layer.
@@ -190,10 +198,10 @@ class Transformation:
             If an exception occurs, it returns None.
         """
         try:
-            df = self.spark.read.format("delta").load(TABLE_PATHS.get('silver'))
-
             df = (
-                df.select(
+                self.spark.read.format("delta")
+                .load(TABLE_PATHS.get("silver"))
+                .select(
                     "id_date",
                     "date",
                     "year",
@@ -210,7 +218,6 @@ class Transformation:
         except Exception as e:
             logger.error(f"{e}")
 
-
     def ufo_gold_astro(self) -> DataFrame:
         """
         Performs transformations for the dim_astro_transform table in the gold layer.
@@ -223,10 +230,10 @@ class Transformation:
             If an exception occurs, it returns None.
         """
         try:
-            df = self.spark.read.format("delta").load(TABLE_PATHS.get('silver'))
-
             df = (
-                df.select(
+                self.spark.read.format("delta")
+                .load(TABLE_PATHS.get("silver"))
+                .select(
                     "id_astro",
                     "moonPhaseAngle",
                 )
@@ -237,7 +244,6 @@ class Transformation:
             return df
         except Exception as e:
             logger.error(f"{e}")
-
 
     def ufo_gold_fact(self) -> DataFrame:
         """
@@ -251,13 +257,15 @@ class Transformation:
             If an exception occurs, it returns None.
         """
         try:
-            df = self.spark.read.format("delta").load(TABLE_PATHS.get('silver'))
-
-            df = df.select(
-                "id_location",
-                "id_description",
-                "id_date",
-                "id_astro",
+            df = (
+                self.spark.read.format("delta")
+                .load(TABLE_PATHS.get("silver"))
+                .select(
+                    "id_location",
+                    "id_description",
+                    "id_date",
+                    "id_astro",
+                )
             )
             logger.info(f"Gold layer transformation for fact completed")
             return df

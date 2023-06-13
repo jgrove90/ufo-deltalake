@@ -1,5 +1,5 @@
 from bs4 import BeautifulSoup
-from pyspark.sql import SparkSession, DataFrame, Window
+from pyspark.sql import DataFrame
 from pyspark.sql.functions import *
 from pyspark.pandas import read_html
 from functools import reduce
@@ -7,7 +7,7 @@ from random import randint
 from time import sleep
 from pyspark.sql.types import *
 from tqdm import tqdm
-from app_utils import LOG_FILE_NAME, get_moon_phase, setup_logger, soup_html
+from app_utils import LOG_FILE_NAME, setup_logger, soup_html
 
 logger = setup_logger("ufo_scraper", LOG_FILE_NAME)
 
@@ -20,7 +20,7 @@ def get_links_inside_table(soup_html: BeautifulSoup) -> list:
         soup_html (BeautifulSoup): The BeautifulSoup object containing the HTML.
 
     Returns:
-        list: A list of links found inside the table. 
+        list: A list of links found inside the table.
         If no table is found or an exception occurs, it returns an empty list.
     """
     try:
@@ -43,7 +43,7 @@ def scrape_ufo_data(url: str) -> DataFrame:
         url (str): The URL of the website to scrape the data from.
 
     Returns:
-        DataFrame: A DataFrame containing the scraped UFO data. 
+        DataFrame: A DataFrame containing the scraped UFO data.
         If an exception occurs, it returns None.
     """
 
