@@ -1,79 +1,71 @@
-from spark.tables import *
-from spark.transformations import *
-from spark.spark_utils import spark_session, load_data
-from spark.ufo_scraper import scrape_ufo_data
-from pyspark.sql import SparkSession
+from spark.spark_utils import SparkSessionCreator
+from spark.table_manager import TableManager
+from spark.table_schema import *
+from spark.transformations import Transformation
+
+# from ufo_scraper import scrape_ufo_data
 
 
-def create_delta_tables(spark: SparkSession) -> None:
-    """
-    Creates tables for data.
-
-    Args:
-        spark (SparkSession): The Spark session.
-
-    Returns:
-        None
-    """
-    create_ufo_bronze_table(spark, "ufo_bronze")
-    create_ufo_silver_table(spark, "ufo_silver")
-    create_ufo_gold_dim_location(spark, "ufo_gold_dim_location")
-    create_ufo_gold_dim_description(spark, "ufo_gold_dim_description")
-    create_ufo_gold_dim_date(spark, "ufo_gold_dim_date")
-    create_ufo_gold_dim_astro(spark, "ufo_gold_dim_astro")
-    create_ufo_gold_fact(spark, "ufo_gold_fact")
+def create_tables(spark):
+    TableManager(spark).create_table("bronze", BRONZE, TABLE_PATHS.get("bronze"))
+    TableManager(spark).create_table("silver", SILVER, TABLE_PATHS.get("silver"))
+    TableManager(spark).create_table(
+        "dim_location", DIM_LOCATION, TABLE_PATHS.get("dim_location")
+    )
+    TableManager(spark).create_table(
+        "dim_description", DIM_DESCRIPTION, TABLE_PATHS.get("dim_description")
+    )
+    TableManager(spark).create_table("dim_date", DIM_DATE, TABLE_PATHS.get("dim_date"))
+    TableManager(spark).create_table(
+        "dim_astro", DIM_ASTRO, TABLE_PATHS.get("dim_astro")
+    )
+    TableManager(spark).create_table("fact", FACT, TABLE_PATHS.get("fact"))
 
 
-def table_transformations(spark: SparkSession) -> list[DeltaTable]:
-    """
-    Perform table transformations.
-
-    Args:
-        spark (SparkSession): The Spark session.
-
-    Returns:
-        list[DeltaTable]: List of DeltaTable objects representing the transformed tables.
-    """
-    tables = [
-        ufo_silver_transform(spark),
-        ufo_gold_location_transform(spark),
-        ufo_gold_description_transform(spark),
-        ufo_gold_date_transform(spark),
-        ufo_gold_astro_transform(spark),
-        ufo_gold_fact_transform(spark),
+def perform_transformations(spark):
+    dataframes = [
+        Transformation(spark).ufo_silver(),
+        Transformation(spark).ufo_gold_location(),
+        Transformation(spark).ufo_gold_description(),
+        Transformation(spark).ufo_gold_date(),
+        Transformation(spark).ufo_gold_astro(),
+        Transformation(spark).ufo_gold_fact(),
     ]
+    return dataframes
 
-    return tables
 
-
-def load_tables(spark: SparkSession, tables: list[DeltaTable]) -> None:
-    """
-    Load tables into Delta Lake.
-
-    Args:
-        spark (SparkSession): The Spark session.
-        tables (list[DeltaTable]): List of DeltaTable objects representing the tables to load.
-
-    Returns:
-        None
-    """
+def load_transformations(spark, dataframes):
     # must be the same order as the transformations
     paths = [
-        "./lakehouse/ufo/silver",
-        "./lakehouse/ufo/gold/dim_location",
-        "./lakehouse/ufo/gold/dim_description",
-        "./lakehouse/ufo/gold/dim_date",
-        "./lakehouse/ufo/gold/dim_astro",
-        "./lakehouse/ufo/gold/fact",
+        TABLE_PATHS.get("silver"),
+        TABLE_PATHS.get("dim_location"),
+        TABLE_PATHS.get("dim_description"),
+        TABLE_PATHS.get("dim_date"),
+        TABLE_PATHS.get("dim_astro"),
+        TABLE_PATHS.get("fact"),
     ]
 
-    for table, path in zip(tables, paths):
-        load_data(spark, table, path)
+    for table, path in zip(dataframes, paths):
+        TableManager(spark).load_data(table, path)
+
+
+def main():
+    # create spark session
+    spark_creator = SparkSessionCreator()
+    spark_creator.create_spark_session()
+    spark = spark_creator.spark
+
+    # create all required tables
+    create_tables(spark)
+
+    # extract data and load into bronze table
+    # df_ufo = scrape_ufo_data("https://nuforc.org/webreports/ndxevent.html")
+    # TableManager(spark).load_data(df_ufo, "./spark-warehouse/ufo/bronze")
+
+    # perform transformations and load into tables
+    data_frames = perform_transformations(spark)
+    load_transformations(spark, data_frames)
 
 
 if __name__ == "__main__":
-    spark = spark_session()
-    create_delta_tables(spark)
-    df_ufo = scrape_ufo_data("https://nuforc.org/webreports/ndxevent.html")
-    load_data(spark, df_ufo, "./spark-warehouse/ufo/bronze")
-    load_tables(spark, table_transformations(spark))
+    main()

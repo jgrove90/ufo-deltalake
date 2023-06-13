@@ -5,91 +5,34 @@ from app_utils import LOG_FILE_NAME, get_package_version, setup_logger
 
 logger = setup_logger("spark_utils", LOG_FILE_NAME)
 
+class SparkSessionCreator:
+    def __init__(self):
+        self.spark = None
+    
+    def create_spark_session(self):
+        """
+        Creates a SparkSession object for interacting with Spark.
 
-def spark_session() -> SparkSession:
-    """
-    Creates a SparkSession object for interacting with Spark.
+        Returns:
+            SparkSession: The SparkSession object.
 
-    Returns:
-        SparkSession: The SparkSession object.
+        Note:
+            The function assumes that the necessary files for distribution
+            are located at './src/app_utils.py' and './src/address_cleaning.py'.
+        """
+        try:
+            delta_version = get_package_version("delta-spark")
 
-    Note:
-        The function assumes that the necessary files for distribution
-        are located at './src/app_utils.py' and './src/address_cleaning.py'.
-    """
-    try:
-        delta_version = get_package_version("delta-spark")
+            self.spark = SparkSession.builder.getOrCreate()
 
-        spark = SparkSession.builder.getOrCreate()
+            # Distributes files across worker nodes
+            file_paths = ["./src/app_utils.py", "./src/address_cleaning.py"]
+            [self.spark.sparkContext.addPyFile(file) for file in file_paths]
 
-        # Distributes files across worker nodes
-        file_paths = ["./src/app_utils.py", "./src/address_cleaning.py"]
-        [spark.sparkContext.addPyFile(file) for file in file_paths]
+            logger.info(
+                f"Created SparkSession for app:{self.spark.conf.get('spark.app.name')} @ {self.spark.sparkContext.master} using delta-spark:{delta_version}"
+            )
 
-        logger.info(
-            f"Created SparkSession for app:{spark.conf.get('spark.app.name')} @ {spark.sparkContext.master} using delta-spark:{delta_version}"
-        )
-
-        return spark
-    except Exception as e:
-        logger.error(f"{e}")
-
-
-def optimize_table(spark: SparkSession, table_path: str) -> DataFrame:
-    """
-    Coalesces small files into larger ones.
-
-    Args:
-        spark (SparkSession): The SparkSession object.
-        table_path (str): The path to the Delta table.
-
-    Returns:
-        DeltaTable: The optimized DeltaTable object.
-    """
-    try:
-        deltatable = (
-            DeltaTable.forPath(spark, table_path).optimize().executeCompaction()
-        )
-        logger.info(f"Coalescing files @ {table_path}")
-        return deltatable
-    except Exception as e:
-        logger.info(f"{e}")
-
-
-def delta_vacuum(spark: SparkSession, table_path: str, retention: int) -> DataFrame:
-    """Removes old files based on retention period.
-
-    Args:
-        spark (SparkSession): The SparkSession object.
-        table_path (str): The path to the Delta table.
-        retention (int): The retention period in hours.
-
-    Returns:
-        DeltaTable: The vacuumed DeltaTable object.
-    """
-    try:
-        deltaTable = DeltaTable.forPath(spark, table_path)
-        logger.info(f"Vacuuming data after optimization @ {table_path}")
-        return deltaTable.vacuum(retention)
-    except Exception as e:
-        logger.error(f"{e}")
-
-
-def load_data(spark: SparkSession, df: DataFrame, table_path: str) -> DataFrame:
-    """Loads source data into Delta table.
-
-    Args:
-        spark (SparkSession): The SparkSession object.
-        df (DataFrame): The DataFrame containing the data to be loaded.
-        table_path (str): The path to the Delta table.
-
-    Returns:
-        DeltaTable: The DeltaTable object after loading the data.
-    """
-    try:
-        df.write.format("delta").mode("overwrite").save(table_path)
-        logger.info(f"Data successfully loaded into delta lake @ {table_path}")
-        optimize_table(spark, table_path)
-        return delta_vacuum(spark, table_path, 0)
-    except Exception as e:
-        logger.error(f"{e}")
+            return self.spark
+        except Exception as e:
+            logger.error(f"{e}")
