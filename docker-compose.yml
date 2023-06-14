@@ -1,69 +1,58 @@
 version: '3.8'
+
+x-defaults:
+  &spark-common
+  image: bitnami/spark:3.4.0
+  user: root
+  environment:
+    - SPARK_CONF_DIR=/opt/bitnami/spark/conf
+    - SPARK_EVENTLOG_ENABLED=true
+    - SPARK_EVENTLOG_DIR=/opt/bitnami/spark/logs
+    - SPARK_HISTORY_OPTS=-Dspark.history.fs.logDirectory=file:/opt/bitnami/spark/logs
+    - SPARK_SQL_EXTENSIONS=io.delta.sql.DeltaSparkSessionExtension
+    - SPARK_SQL_CATALOG_IMPLEMENTATION=io.delta.sql.DeltaCatalog
+  volumes:
+    - ./lakehouse:/opt/bitnami/spark/data
+    - ./logs/spark:/opt/bitnami/spark/logs
+
 services:
   spark-master:
-    image: bitnami/spark:latest
+    <<: *spark-common
     container_name: spark-master
     hostname: spark-master
-    user: root
     environment:
       - SPARK_MODE=master
       - SPARK_MASTER_HOST=spark-master
       - SPARK_MASTER_PORT=7077
       - SPARK_MASTER_WEBUI_PORT=8080
-      - SPARK_CONF_DIR=/opt/bitnami/spark/conf
-      - SPARK_EVENTLOG_ENABLED=true
-      - SPARK_EVENTLOG_DIR=/opt/bitnami/spark/logs
-      - SPARK_HISTORY_OPTS=-Dspark.history.fs.logDirectory=file:/opt/bitnami/spark/logs
-      - SPARK_SQL_EXTENSIONS=io.delta.sql.DeltaSparkSessionExtension
-      - SPARK_SQL_CATALOG_IMPLEMENTATION=io.delta.sql.DeltaCatalog
     ports:
       - 8080:8080
       - 7077:7077
-    volumes:
-      - ./lakehouse:/opt/bitnami/spark/data
-      - ./logs/spark:/opt/bitnami/spark/logs
 
   spark-worker:
-    image: bitnami/spark:latest
+    <<: *spark-common
     container_name: spark-worker
     hostname: spark-worker
-    user: root
     depends_on:
       - spark-master
     environment:
       - SPARK_MODE=worker
       - SPARK_MASTER=spark://spark-master:7077
-      - SPARK_CONF_DIR=/opt/bitnami/spark/conf
-      - SPARK_EVENTLOG_ENABLED=true
-      - SPARK_EVENTLOG_DIR=/opt/bitnami/spark/logs
-      - SPARK_HISTORY_OPTS=-Dspark.history.fs.logDirectory=file:/opt/bitnami/spark/logs
-      - SPARK_SQL_EXTENSIONS=io.delta.sql.DeltaSparkSessionExtension
-      - SPARK_SQL_CATALOG_IMPLEMENTATION=io.delta.sql.DeltaCatalog
       - SPARK_DRIVER_MEMORY=4g
       - SPARK_EXECUTOR_MEMORY=4g
       - SPARK_DRIVER_CORES=3
       - SPARK_EXECUTOR_CORES=10
     ports:
       - 4040:4040
-    volumes:
-      - ./lakehouse:/opt/bitnami/spark/data
-      - ./logs/spark:/opt/bitnami/spark/logs
 
   spark-history-server:
-    image: bitnami/spark:latest
+    <<: *spark-common
     container_name: spark-history-server
     hostname: spark-history-server
-    user: root
     depends_on:
       - spark-master
-    environment:
-      - SPARK_HISTORY_OPTS=-Dspark.history.fs.logDirectory=file:/opt/bitnami/spark/logs
-      - SPARK_CONF_DIR=/opt/bitnami/spark/conf
     ports:
       - 18080:18080
-    volumes:
-      - ./lakehouse:/opt/bitnami/spark/data
-      - ./logs/spark:/opt/bitnami/spark/logs
     command: >
       bash -c "/opt/bitnami/spark/sbin/start-history-server.sh"
 
@@ -72,6 +61,8 @@ services:
     image: python3.10.6
     container_name: python_app
     hostname: python_app
+    depends_on:
+      - spark-master 
     build:
       context: .
       dockerfile: ./Dockerfile
