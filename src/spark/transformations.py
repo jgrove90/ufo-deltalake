@@ -3,11 +3,13 @@ from pyspark.sql.functions import *
 from pyspark.sql.types import *
 from app_utils import LOG_FILE_NAME, get_moon_phase, setup_logger
 from datetime import datetime
-from spark.table_schema import TABLE_PATHS
+from spark.table_schema import TABLE_PATHS, LAKEHOUSE
+import sys
 
 logger = setup_logger("transformations", LOG_FILE_NAME)
 
-
+bronze_table = f"./{LAKEHOUSE}/{TABLE_PATHS.get('bronze')}"
+silver_table = f"./{LAKEHOUSE}/{TABLE_PATHS.get('silver')}"
 class Transformation:
     def __init__(self, spark):
         self.spark = spark
@@ -41,7 +43,7 @@ class Transformation:
 
             df = (
                 self.spark.read.format("delta")
-                .load(TABLE_PATHS.get("bronze"))
+                .load(bronze_table)
                 # filter for USA
                 .filter(col("Country") == "USA")
                 # change null value to No
@@ -83,7 +85,7 @@ class Transformation:
                 # call the moon_phase_udf
                 .withColumn("moonPhaseAngle", get_moon_phase_udf("date").cast("double"))
                 # drop columns/rows
-                .drop("DateTime", "Posted", "timestamp", "temp_address")
+                .drop(col("DateTime"), "Posted", "timestamp", "temp_address")
                 .dropDuplicates()
                 .dropna()
                 # create id columns
@@ -126,6 +128,7 @@ class Transformation:
             return df
         except Exception as e:
             logger.error(f"{e}")
+            sys.exit()
 
     def ufo_gold_location(self) -> DataFrame:
         """
@@ -141,7 +144,7 @@ class Transformation:
         try:
             df = (
                 self.spark.read.format("delta")
-                .load(TABLE_PATHS.get("silver"))
+                .load(silver_table)
                 .select(
                     "id_location",
                     "city",
@@ -155,6 +158,7 @@ class Transformation:
             return df
         except Exception as e:
             logger.error(f"{e}")
+            sys.exit()
 
     def ufo_gold_description(self) -> DataFrame:
         """
@@ -170,7 +174,7 @@ class Transformation:
         try:
             df = (
                 self.spark.read.format("delta")
-                .load(TABLE_PATHS.get("silver"))
+                .load(silver_table)
                 .select(
                     "id_description",
                     "shape",
@@ -185,6 +189,7 @@ class Transformation:
             return df
         except Exception as e:
             logger.error(f"{e}")
+            sys.exit()
 
     def ufo_gold_date(self) -> DataFrame:
         """
@@ -200,7 +205,7 @@ class Transformation:
         try:
             df = (
                 self.spark.read.format("delta")
-                .load(TABLE_PATHS.get("silver"))
+                .load(silver_table)
                 .select(
                     "id_date",
                     "date",
@@ -217,6 +222,7 @@ class Transformation:
             return df
         except Exception as e:
             logger.error(f"{e}")
+            sys.exit()
 
     def ufo_gold_astro(self) -> DataFrame:
         """
@@ -232,7 +238,7 @@ class Transformation:
         try:
             df = (
                 self.spark.read.format("delta")
-                .load(TABLE_PATHS.get("silver"))
+                .load(silver_table)
                 .select(
                     "id_astro",
                     "moonPhaseAngle",
@@ -244,6 +250,7 @@ class Transformation:
             return df
         except Exception as e:
             logger.error(f"{e}")
+            sys.exit()
 
     def ufo_gold_fact(self) -> DataFrame:
         """
@@ -259,7 +266,7 @@ class Transformation:
         try:
             df = (
                 self.spark.read.format("delta")
-                .load(TABLE_PATHS.get("silver"))
+                .load(silver_table)
                 .select(
                     "id_location",
                     "id_description",
@@ -271,3 +278,4 @@ class Transformation:
             return df
         except Exception as e:
             logger.error(f"{e}")
+            sys.exit()
