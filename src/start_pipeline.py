@@ -2,7 +2,7 @@ from spark.spark_utils import SparkSessionCreator, SparkSession
 from spark.table_manager import TableManager
 from spark.table_schema import *
 from spark.transformations import Transformation
-from ufo_scraper import scrape_ufo_data
+from spark.ufo_scraper import scrape_ufo_data
 import os
 
 
@@ -48,13 +48,13 @@ def create_tables(spark: SparkSession) -> None:
         None
     """
     tables = [
-        ("bronze", BRONZE, TABLE_PATHS.get("bronze")),
-        ("silver", SILVER, TABLE_PATHS.get("silver")),
-        ("dim_location", DIM_LOCATION, TABLE_PATHS.get("dim_location")),
-        ("dim_description", DIM_DESCRIPTION, TABLE_PATHS.get("dim_description")),
-        ("dim_date", DIM_DATE, TABLE_PATHS.get("dim_date")),
-        ("dim_astro", DIM_ASTRO, TABLE_PATHS.get("dim_astro")),
-        ("fact", FACT, TABLE_PATHS.get("fact")),
+        ("bronze", BRONZE, f"{TABLE_PATHS.get('bronze')}"),
+        ("silver", SILVER, f"{TABLE_PATHS.get('silver')}"),
+        ("dim_location", DIM_LOCATION, f"{TABLE_PATHS.get('dim_location')}"),
+        ("dim_description", DIM_DESCRIPTION, f"{TABLE_PATHS.get('dim_description')}"),
+        ("dim_date", DIM_DATE, f"{TABLE_PATHS.get('dim_date')}"),
+        ("dim_astro", DIM_ASTRO, f"{TABLE_PATHS.get('dim_astro')}"),
+        ("fact", FACT, f"{TABLE_PATHS.get('fact')}"),
     ]
 
     for table_name, columns, path in tables:
@@ -70,14 +70,15 @@ def load_transformations(spark: SparkSession) -> None:
 
     Returns:
         None
+    
     """
     transformations = [
-        ("ufo_silver", TABLE_PATHS.get("silver")),
-        ("ufo_gold_location", TABLE_PATHS.get("dim_location")),
-        ("ufo_gold_description", TABLE_PATHS.get("dim_description")),
-        ("ufo_gold_date", TABLE_PATHS.get("dim_date")),
-        ("ufo_gold_astro", TABLE_PATHS.get("dim_astro")),
-        ("ufo_gold_fact", TABLE_PATHS.get("fact")),
+        ("ufo_silver", f"./{LAKEHOUSE}/{TABLE_PATHS.get('silver')}"),
+        ("ufo_gold_location", f"./{LAKEHOUSE}/{TABLE_PATHS.get('dim_location')}"),
+        ("ufo_gold_description", f"./{LAKEHOUSE}/{TABLE_PATHS.get('dim_description')}"),
+        ("ufo_gold_date", f"./{LAKEHOUSE}/{TABLE_PATHS.get('dim_date')}"),
+        ("ufo_gold_astro", f"./{LAKEHOUSE}/{TABLE_PATHS.get('dim_astro')}"),
+        ("ufo_gold_fact", f"./{LAKEHOUSE}/{TABLE_PATHS.get('fact')}"),
     ]
 
     for transformation, path in transformations:
@@ -95,7 +96,7 @@ def main():
     - Performs transformations and loads data into tables
     """
     # create folders
-    folders = ["./logs/spark", "./lakehouse"]
+    folders = ["./logs/spark"]
     create_missing_folders(folders)
 
     # create spark session
@@ -106,7 +107,7 @@ def main():
 
     # extract data and load into bronze table
     df_ufo = scrape_ufo_data("https://nuforc.org/webreports/ndxevent.html")
-    TableManager(spark).load_data(df_ufo, "./spark-warehouse/ufo/bronze")
+    TableManager(spark).load_data(df_ufo, f"./{LAKEHOUSE}/{TABLE_PATHS.get('bronze')}")
 
     # perform transformations and load into silver/gold tables
     load_transformations(spark)
