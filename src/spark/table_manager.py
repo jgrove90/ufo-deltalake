@@ -1,6 +1,7 @@
 from delta import DeltaTable
 from app_utils import LOG_FILE_NAME, setup_logger
 from pyspark.sql import DataFrame
+from spark.table_schema import LAKEHOUSE
 
 logger = setup_logger("table_manager", LOG_FILE_NAME)
 
@@ -81,7 +82,7 @@ class TableManager:
             DeltaTable: The created DeltaTable object.
         """
         try:
-            if DeltaTable.isDeltaTable(self.spark, f"{table_path}"):
+            if DeltaTable.isDeltaTable(self.spark, table_path):
                 logger.info(
                     f"Delta table: '{table_name}' already exists @ '{table_path}'"
                 )
