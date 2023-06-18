@@ -1,11 +1,13 @@
+LAKEHOUSE = "lakehouse"
+
 TABLE_PATHS = {
-    "bronze": "/opt/ufo-lakehouse/lakehouse/ufo/bronze",
-    "silver": "/opt/ufo-lakehouse/lakehouse/ufo/silver",
-    "dim_location": "/opt/ufo-lakehouse/lakehouse/ufo/gold/dim_location",
-    "dim_description": "/opt/ufo-lakehouse/lakehouse/ufo/gold/dim_description",
-    "dim_date": "/opt/ufo-lakehouse/lakehouse/ufo/gold/dim_date",
-    "dim_astro": "/opt/ufo-lakehouse/lakehouse/ufo/gold/dim_astro",
-    "fact": "/opt/ufo-lakehouse//lakehouse/ufo/gold/fact",
+    "bronze": "ufo/bronze",
+    "silver": "ufo/silver",
+    "dim_location": "ufo/gold/dim_location",
+    "dim_description": "ufo/gold/dim_description",
+    "dim_date": "ufo/gold/dim_date",
+    "dim_astro": "ufo/gold/dim_astro",
+    "fact": "ufo/gold/fact",
 }
 
 # Bronze layer
