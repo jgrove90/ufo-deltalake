@@ -1,5 +1,8 @@
 version: '3.8'
 
+networks:
+  spark-network:
+
 x-defaults:
   &spark-common
   image: bitnami/spark:3.4.0
@@ -11,6 +14,8 @@ x-defaults:
     - SPARK_HISTORY_OPTS=-Dspark.history.fs.logDirectory=file:/opt/bitnami/spark/logs
     - SPARK_SQL_EXTENSIONS=io.delta.sql.DeltaSparkSessionExtension
     - SPARK_SQL_CATALOG_IMPLEMENTATION=io.delta.sql.DeltaCatalog
+  networks:
+    - spark-network
   volumes:
     - ./lakehouse:/opt/bitnami/spark/data
     - ./logs/spark:/opt/bitnami/spark/logs
@@ -56,17 +61,20 @@ services:
     command: >
       bash -c "/opt/bitnami/spark/sbin/start-history-server.sh"
 
-  # python dev enviroment
-  python:
-    image: python3.10.6
-    container_name: python_app
-    hostname: python_app
+  spark-driver:
+    image: spark-driver
+    container_name: spark-driver
+    hostname: spark-driver
+    user: appuser
+    tty: true
     depends_on:
-      - spark-master 
+      - spark-worker 
     build:
       context: .
       dockerfile: ./Dockerfile
+    networks:
+      - spark-network
     ports:
       - 8888:8888
     volumes:
-      - .:/opt/ufo-lakehouse
+      - .:/home/appuser/code/ufo-lakehouse
