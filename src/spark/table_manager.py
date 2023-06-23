@@ -1,7 +1,6 @@
 from delta import DeltaTable
 from app_utils import LOG_FILE_NAME, setup_logger
 from pyspark.sql import DataFrame
-from spark.table_schema import LAKEHOUSE
 
 logger = setup_logger("table_manager", LOG_FILE_NAME)
 
@@ -26,7 +25,9 @@ class TableManager:
                 .optimize()
                 .executeCompaction()
             )
+
             logger.info(f"Coalescing files @ {table_path}")
+            
             return deltatable
         except Exception as e:
             logger.info(f"{e}")
@@ -43,7 +44,9 @@ class TableManager:
         """
         try:
             deltaTable = DeltaTable.forPath(self.spark, table_path)
+
             logger.info(f"Vacuuming data after optimization @ {table_path}")
+
             return deltaTable.vacuum(retention)
         except Exception as e:
             logger.error(f"{e}")
@@ -60,14 +63,17 @@ class TableManager:
         """
         try:
             df.write.format("delta").mode("overwrite").save(table_path)
+
             logger.info(f"Data successfully loaded into delta lake @ {table_path}")
+
             self.optimize_table(table_path)
+
             return self.delta_vacuum(table_path, 0)
         except Exception as e:
             logger.error(f"{e}")
 
     def create_table(
-        self, table_name: str, columns: list, table_path: str
+        self, table_name: str, columns: list[tuple], table_path: str
     ) -> DeltaTable:
         """
         Creates a Delta table with the specified table name, columns, and path.
@@ -82,20 +88,19 @@ class TableManager:
             DeltaTable: The created DeltaTable object.
         """
         try:
-            if DeltaTable.isDeltaTable(self.spark, table_path):
-                logger.info(
-                    f"Delta table: '{table_name}' already exists @ '{table_path}'"
-                )
-            else:
-                table_builder = (
-                    DeltaTable.createIfNotExists(self.spark)
-                    .tableName(table_name)
-                    .location(table_path)
-                )
-                for column in columns:
-                    table_builder = table_builder.addColumn(column[0], column[1])
-                table = table_builder.execute()
-                logger.info(f"Delta table: {table_name} created  @ '{table_path}'")
-                return table
+            table_builder = (
+                DeltaTable.createIfNotExists(self.spark)
+                .tableName(table_name)
+                .location(table_path)
+            )
+
+            for column in columns:
+                table_builder = table_builder.addColumn(column[0], column[1])
+            
+            table = table_builder.execute()
+
+            logger.info(f"Delta table: {table_name} created  @ '{table_path}'")
+
+            return table
         except Exception as e:
             print(f"{e}")
