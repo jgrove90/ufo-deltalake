@@ -1,8 +1,10 @@
 import logging
-import requests
+from requests import get
 from importlib.metadata import version
 from bs4 import BeautifulSoup
 import ephem
+import sys
+import os
 
 # set log file name for app
 LOG_FILE_NAME = "./logs/app.log"
@@ -70,14 +72,15 @@ def soup_html(url: str) -> BeautifulSoup:
         logger = setup_logger("webscraping", LOG_FILE_NAME)
 
         # retreive html and create soup object for parsing
-        response = requests.get(url)
+        response = get(url)
         soup = BeautifulSoup(response.text, "html.parser")
 
         logger.info(f"Received response from {url}")
 
         return soup
-    except requests.exceptions.RequestException as e:
+    except Exception as e:
         logger.error(f"{e}")
+        sys.exit()
 
 
 def get_moon_phase(date):
@@ -96,7 +99,7 @@ def get_moon_phase(date):
             year = int(str(date)[:4])
             if year < 1900 or year > 2100:
                 return None
-            
+
         # Convert date to ephem format
         ephem_date = ephem.Date(date)
 
@@ -111,3 +114,32 @@ def get_moon_phase(date):
         logger.error(f"{e}")
         return None
 
+
+def get_file_path(directory: str, extension: str) -> list[str]:
+    """
+    Retrieve a list of files with a specific extension from a directory and its subdirectories.
+
+    Args:
+        directory (str): The path to the directory to search in.
+        extension (str): The file extension to filter the files by.
+
+    Returns:
+        list[str]: A list of file names that match the specified extension.
+    """
+    try:
+        logger = setup_logger("utils", LOG_FILE_NAME)
+        
+        files = []
+
+        for root, dirnames, filenames in os.walk(directory):
+            for file in filenames:
+                if file.endswith(extension):
+                    relative_path = os.path.relpath(os.path.join(root, file))
+                    files.append(f"./{relative_path}")
+        
+        logger.info(f"{len(files)} {extension} files found {files}")
+        
+        return files
+    except Exception as e:
+        logger.error(f"{e}")
+        sys.exit()
