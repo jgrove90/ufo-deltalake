@@ -4,6 +4,7 @@ from spark.table_schema import *
 from spark.transformations import Transformation
 from spark.ufo_scraper import scrape_ufo_data
 import os
+import time
 
 
 def create_missing_folders(folders: list) -> None:
@@ -95,6 +96,8 @@ def main():
     - Extracts data via webscraping
     - Performs transformations and loads data into tables
     """
+    start_time = time.time()
+
     # create folders
     folders = ["./logs/spark"]
     create_missing_folders(folders)
@@ -112,6 +115,15 @@ def main():
     # perform transformations and load into silver/gold tables
     load_transformations(spark)
 
+    end_time = time.time()
+
+    elapsed_time = end_time - start_time
+
+    hours = int(elapsed_time // 3600)
+    minutes = int((elapsed_time % 3600) // 60)
+    seconds = int(elapsed_time % 60)
+
+    print(f"\nElapsed time: {hours} hours, {minutes} minutes, {seconds} seconds")
 
 if __name__ == "__main__":
     main()
