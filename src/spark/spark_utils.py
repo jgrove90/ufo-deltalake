@@ -18,7 +18,7 @@ class SparkSessionCreator:
 
         Note:
             The function assumes that the necessary files for distribution
-            are located at './src/app_utils.py' and './src/address_cleaning.py'.
+            are located under ./src
         """
         try:
             delta_version = get_package_version("delta-spark")
