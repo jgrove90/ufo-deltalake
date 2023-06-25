@@ -5,20 +5,14 @@ networks:
 
 x-defaults:
   &spark-common
-  image: bitnami/spark:3.4.0
+  image: apache-spark
   user: root
-  environment:
-    - SPARK_CONF_DIR=/opt/bitnami/spark/conf
-    - SPARK_EVENTLOG_ENABLED=true
-    - SPARK_EVENTLOG_DIR=/opt/bitnami/spark/logs
-    - SPARK_HISTORY_OPTS=-Dspark.history.fs.logDirectory=file:/opt/bitnami/spark/logs
-    - SPARK_SQL_EXTENSIONS=io.delta.sql.DeltaSparkSessionExtension
-    - SPARK_SQL_CATALOG_IMPLEMENTATION=io.delta.sql.DeltaCatalog
   networks:
     - spark-network
   volumes:
-    - ./lakehouse:/opt/bitnami/spark/data
+    - .:/opt/ufo-lakehouse
     - ./logs/spark:/opt/bitnami/spark/logs
+    - ./src/spark/spark-defaults.conf:/opt/bitnami/spark/conf/spark-defaults.conf
 
 services:
   spark-master:
@@ -34,21 +28,29 @@ services:
       - 8080:8080
       - 7077:7077
 
-  spark-worker:
+  spark-worker-1:
     <<: *spark-common
-    container_name: spark-worker
-    hostname: spark-worker
+    container_name: spark-worker-1
+    hostname: spark-worker-1
     depends_on:
       - spark-master
     environment:
       - SPARK_MODE=worker
       - SPARK_MASTER=spark://spark-master:7077
-      - SPARK_DRIVER_MEMORY=4g
-      - SPARK_EXECUTOR_MEMORY=4g
-      - SPARK_DRIVER_CORES=3
-      - SPARK_EXECUTOR_CORES=10
     ports:
       - 4040:4040
+
+  spark-worker-2:
+    <<: *spark-common
+    container_name: spark-worker-2
+    hostname: spark-worker-2
+    depends_on:
+      - spark-master
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER=spark://spark-master:7077
+    ports:
+      - 4041:4041
 
   spark-history-server:
     <<: *spark-common
@@ -56,19 +58,20 @@ services:
     hostname: spark-history-server
     depends_on:
       - spark-master
+    environment:
+      - SPARK_HISTORY_OPTS=-Dspark.history.fs.logDirectory=file:/opt/bitnami/spark/logs
     ports:
       - 18080:18080
     command: >
       bash -c "/opt/bitnami/spark/sbin/start-history-server.sh"
 
   spark-driver:
-    image: spark-driver
+    image: ufo-deltalake
     container_name: spark-driver
     hostname: spark-driver
-    user: appuser
     tty: true
     depends_on:
-      - spark-worker 
+      - spark-master 
     build:
       context: .
       dockerfile: ./Dockerfile
@@ -77,4 +80,4 @@ services:
     ports:
       - 8888:8888
     volumes:
-      - .:/home/appuser/code/ufo-lakehouse
+      - .:/opt/ufo-lakehouse
