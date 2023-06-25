@@ -74,12 +74,12 @@ def load_transformations(spark: SparkSession) -> None:
     
     """
     transformations = [
-        ("ufo_silver", f"./{LAKEHOUSE}/{TABLE_PATHS.get('silver')}"),
-        ("ufo_gold_location", f"./{LAKEHOUSE}/{TABLE_PATHS.get('dim_location')}"),
-        ("ufo_gold_description", f"./{LAKEHOUSE}/{TABLE_PATHS.get('dim_description')}"),
-        ("ufo_gold_date", f"./{LAKEHOUSE}/{TABLE_PATHS.get('dim_date')}"),
-        ("ufo_gold_astro", f"./{LAKEHOUSE}/{TABLE_PATHS.get('dim_astro')}"),
-        ("ufo_gold_fact", f"./{LAKEHOUSE}/{TABLE_PATHS.get('fact')}"),
+        ("ufo_silver", f"./{DELTALAKE}/{TABLE_PATHS.get('silver')}"),
+        ("ufo_gold_location", f"./{DELTALAKE}/{TABLE_PATHS.get('dim_location')}"),
+        ("ufo_gold_description", f"./{DELTALAKE}/{TABLE_PATHS.get('dim_description')}"),
+        ("ufo_gold_date", f"./{DELTALAKE}/{TABLE_PATHS.get('dim_date')}"),
+        ("ufo_gold_astro", f"./{DELTALAKE}/{TABLE_PATHS.get('dim_astro')}"),
+        ("ufo_gold_fact", f"./{DELTALAKE}/{TABLE_PATHS.get('fact')}"),
     ]
 
     for transformation, path in transformations:
@@ -110,7 +110,7 @@ def main():
 
     # extract data and load into bronze table
     df_ufo = scrape_ufo_data("https://nuforc.org/webreports/ndxevent.html")
-    TableManager(spark).load_data(df_ufo, f"./{LAKEHOUSE}/{TABLE_PATHS.get('bronze')}")
+    TableManager(spark).load_data(df_ufo, f"./{DELTALAKE}/{TABLE_PATHS.get('bronze')}")
 
     # perform transformations and load into silver/gold tables
     load_transformations(spark)
