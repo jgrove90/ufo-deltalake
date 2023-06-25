@@ -154,7 +154,7 @@ dmypy.json
 cython_debug/
 
 # data folders
-lakehouse/*
+deltalake/*
 
 # html test files
 *.html
