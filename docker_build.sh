@@ -1,4 +1,4 @@
 #!/bin/bash
 
-docker build --target python -t spark-driver . && \
-docker build --target spark -t apache-spark . 
+docker build --target python -t ufo-deltalake . && \
+docker build --target spark -t apache-spark .
