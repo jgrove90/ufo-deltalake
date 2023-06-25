@@ -143,3 +143,24 @@ def get_file_path(directory: str, extension: str) -> list[str]:
     except Exception as e:
         logger.error(f"{e}")
         sys.exit()
+
+def read_requirements(file_path: str) -> list[str]:
+    """
+    Read a requirements.txt file and return a list of packages.
+
+    Args:
+        file_path (str): Path to the requirements.txt file.
+
+    Returns:
+        list: List of packages specified in the requirements.txt file.
+    """
+    try:
+        with open(file_path, 'r') as file:
+            requirements = file.readlines()
+        
+        requirements = [line.strip() for line in requirements]
+        
+        return requirements
+    except Exception as e:
+        logger = setup_logger("utils", LOG_FILE_NAME)
+        logger.error(f"{e}")
