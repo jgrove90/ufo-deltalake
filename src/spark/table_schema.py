@@ -1,4 +1,4 @@
-LAKEHOUSE = "lakehouse"
+DELTALAKE = "deltalake"
 
 TABLE_PATHS = {
     "bronze": "ufo/bronze",
@@ -25,37 +25,30 @@ BRONZE = [
 
 # Silver layer
 SILVER = [
-    ("id", "LONG"),
-    ("id_location", "LONG"),
     ("city", "STRING"),
     ("state", "STRING"),
     ("country", "STRING"),
-    ("id_description", "LONG"),
     ("shape", "STRING"),
     ("duration", "STRING"),
     ("summary", "STRING"),
     ("images", "STRING"),
-    ("id_date", "LONG"),
     ("date", "DATE"),
     ("year", "INT"),
     ("month", "INT"),
     ("dayofweek", "STRING"),
     ("week", "INT"),
     ("hour", "INT"),
-    ("id_astro", "LONG"),
     ("moonPhaseAngle", "DOUBLE"),
 ]
 
 # Gold layer
 DIM_LOCATION = [
-    ("id_location", "LONG"),
     ("city", "STRING"),
     ("state", "STRING"),
     ("country", "STRING"),
 ]
 
 DIM_DESCRIPTION = [
-    ("id_description", "LONG"),
     ("shape", "STRING"),
     ("duration", "STRING"),
     ("summary", "STRING"),
@@ -63,7 +56,6 @@ DIM_DESCRIPTION = [
 ]
 
 DIM_DATE = [
-    ("id_date", "LONG"),
     ("date", "DATE"),
     ("year", "INT"),
     ("month", "INT"),
@@ -73,13 +65,16 @@ DIM_DATE = [
 ]
 
 DIM_ASTRO = [
-    ("id_astro", "LONG"),
     ("moonPhaseAngle", "DOUBLE"),
 ]
 
 FACT = [
-    ("id_location", "LONG"),
-    ("id_description", "LONG"),
-    ("id_date", "LONG"),
-    ("id_astro", "LONG"),
+    ("state", "STRING"),
+    ("shape", "STRING"),
+    ("year", "INT"),
+    ("moonPhaseAngle", "DOUBLE"),
+    ("state_count", "INT"),
+    ("shape_count", "INT"),
+    ("year_count", "INT"),
+    ("phaseangle_count", "INT"),
 ]
