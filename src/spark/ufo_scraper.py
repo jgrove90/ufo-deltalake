@@ -8,6 +8,7 @@ from time import sleep
 from pyspark.sql.types import *
 from tqdm import tqdm
 from app_utils import LOG_FILE_NAME, setup_logger, soup_html
+import sys
 
 logger = setup_logger("ufo_scraper", LOG_FILE_NAME)
 
@@ -83,3 +84,4 @@ def scrape_ufo_data(url: str) -> DataFrame:
         return df
     except Exception as e:
         logger.error(f"{e}")
+        sys.exit()
