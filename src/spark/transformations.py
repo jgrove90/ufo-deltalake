@@ -3,13 +3,15 @@ from pyspark.sql.functions import *
 from pyspark.sql.types import *
 from app_utils import LOG_FILE_NAME, get_moon_phase, setup_logger
 from datetime import datetime
-from spark.table_schema import TABLE_PATHS, LAKEHOUSE
+from spark.table_schema import TABLE_PATHS, DELTALAKE
 import sys
 
 logger = setup_logger("transformations", LOG_FILE_NAME)
 
-bronze_table = f"./{LAKEHOUSE}/{TABLE_PATHS.get('bronze')}"
-silver_table = f"./{LAKEHOUSE}/{TABLE_PATHS.get('silver')}"
+bronze_table = f"./{DELTALAKE}/{TABLE_PATHS.get('bronze')}"
+silver_table = f"./{DELTALAKE}/{TABLE_PATHS.get('silver')}"
+
+
 class Transformation:
     def __init__(self, spark):
         self.spark = spark
@@ -28,18 +30,6 @@ class Transformation:
         try:
             # register the get_moon_phase() function as a UDF
             get_moon_phase_udf = udf(get_moon_phase)
-
-            # columns for window functions
-            loc_columns = ["city", "state", "country",]
-            desc_columns = ["shape", "duration", "summary", "images",]
-            date_columns = ["date", "year", "dayOfWeek", "week", "hour",]
-        
-            # windows
-            location_window = Window.orderBy(loc_columns)
-            description_window = Window.orderBy(desc_columns)
-            date_window = Window.orderBy(date_columns)
-            astro_window = Window.orderBy("moonPhaseAngle")
- 
 
             df = (
                 self.spark.read.format("delta")
@@ -88,41 +78,6 @@ class Transformation:
                 .drop(col("DateTime"), "Posted", "timestamp", "temp_address")
                 .dropDuplicates()
                 .dropna()
-                # create id columns
-                .withColumn(
-                    "id", row_number().over(Window.orderBy(asc("date"))).cast("long")
-                )
-                .withColumn(
-                    "id_location", dense_rank().over(location_window).cast("long")
-                )
-                .withColumn(
-                    "id_description", dense_rank().over(description_window).cast("long")
-                )
-                .withColumn("id_date", dense_rank().over(date_window).cast("long"))
-                .withColumn("id_astro", dense_rank().over(astro_window).cast("long"))
-                # set the order of columns
-                .select(
-                    "id",
-                    "id_location",
-                    "city",
-                    "state",
-                    "country",
-                    "id_description",
-                    "shape",
-                    "duration",
-                    "summary",
-                    "images",
-                    "id_date",
-                    "date",
-                    "year",
-                    "month",
-                    "dayOfWeek",
-                    "week",
-                    "hour",
-                    "id_astro",
-                    "moonPhaseAngle",
-                )
-                .orderBy(desc("id"))
             )
             logger.info(f"Silver layer transformation completed")
             return df
@@ -146,13 +101,11 @@ class Transformation:
                 self.spark.read.format("delta")
                 .load(silver_table)
                 .select(
-                    "id_location",
                     "city",
                     "state",
                     "country",
                 )
                 .dropDuplicates()
-                .orderBy(asc("id_location"))
             )
             logger.info(f"Gold layer transformation for dim_location completed")
             return df
@@ -176,14 +129,12 @@ class Transformation:
                 self.spark.read.format("delta")
                 .load(silver_table)
                 .select(
-                    "id_description",
                     "shape",
                     "duration",
                     "summary",
                     "images",
                 )
                 .dropDuplicates()
-                .orderBy(asc("id_description"))
             )
             logger.info(f"Gold layer transformation for dim_description completed")
             return df
@@ -207,7 +158,6 @@ class Transformation:
                 self.spark.read.format("delta")
                 .load(silver_table)
                 .select(
-                    "id_date",
                     "date",
                     "year",
                     "month",
@@ -216,7 +166,6 @@ class Transformation:
                     "hour",
                 )
                 .dropDuplicates()
-                .orderBy(asc("id_date"))
             )
             logger.info(f"Gold layer transformation for dim_date completed")
             return df
@@ -240,11 +189,9 @@ class Transformation:
                 self.spark.read.format("delta")
                 .load(silver_table)
                 .select(
-                    "id_astro",
                     "moonPhaseAngle",
                 )
                 .dropDuplicates()
-                .orderBy(asc("id_astro"))
             )
             logger.info(f"Gold layer transformation for dim_astro completed")
             return df
@@ -268,10 +215,22 @@ class Transformation:
                 self.spark.read.format("delta")
                 .load(silver_table)
                 .select(
-                    "id_location",
-                    "id_description",
-                    "id_date",
-                    "id_astro",
+                    "state",
+                    "shape",
+                    "year",
+                    "moonPhaseAngle",
+                )
+                .groupBy(
+                    "state",
+                    "shape",
+                    "year",
+                    "moonPhaseAngle",
+                )
+                .agg(
+                    count(col("state")).cast("int").alias("state_count"),
+                    count(col("shape")).cast("int").alias("shape_count"),
+                    count(col("year")).cast("int").alias("year_count"),
+                    count(col("moonPhaseAngle")).cast("int").alias("phaseangle_count"),
                 )
             )
             logger.info(f"Gold layer transformation for fact completed")
