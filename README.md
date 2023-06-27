@@ -1,13 +1,10 @@
 <h1 align="center"> <img src="img/ufo-deltalake.png" alt="Mr.Grey" width="832" 
      height="270"/></h1>
 
-<p align="center" style="color:#40A7FF;font-size:28px"><b>UFO Sighting ELT Pipeline</b></p>
+<h1 align="center" style="color:#40A7FF;font-size:28px"><b>UFO Sighting ELT Pipeline</b></h1>
 
 <p align="center">
-<img src="https://img.shields.io/github/issues/jgrove90/ufo-lakehouse"> 
-<img src="https://img.shields.io/github/forks/jgrove90/ufo-lakehouse"> 
-<img src="https://img.shields.io/github/stars/jgrove90/ufo-lakehouse">
-<img src="https://img.shields.io/github/watchers/jgrove90/ufo-lakehouse"> 
+<img src="https://img.shields.io/github/issues/jgrove90/ufo-lakehouse">  
 <img src="https://img.shields.io/github/languages/code-size/jgrove90/ufo-lakehouse">
 <img src="https://img.shields.io/tokei/lines/github/jgrove90/ufo-lakehouse">
 </p>
@@ -15,10 +12,10 @@
 <p align="center">
   <a href="#about">About</a> •
   <a href="#installation">Installation</a> •
-  <a href="#contributing">Improvements</a>
+  <a href="#improvements">Improvements</a>
 </p>
 
-<p style="color:#40A7FF;font-size:25px" class="about">About</p>
+<h2 id="about">About</h2>
 
 <p>This project showcases an Extract, Load, Transform (ELT) pipeline built with Python, Apache Spark, Delta Lake, and Docker. The objective of the project is to scrape UFO sighting data from the National UFO Reporting Center (NUFORC) and process it through the Medallion architecture to create a star schema in the Gold layer.</p>
 
@@ -33,7 +30,7 @@
 <h1 align="center"> <img src="img/medallion.png" alt="Mr.Grey" width="832" 
      height="270"/></h1>
 
-<h3 style="color:#40A7FF">Key Technologies:</h3>
+<h3>Key Technologies:</h3>
 
 <ul>
   <li>Python: Web scraping and scripting language</li>
@@ -42,7 +39,7 @@
   <li>Docker: Containerization platform for easy deployment and reproducibility</li>
 </ul>
 
-<h3 style="color:#40A7FF">Application services at runtime:</h3>
+<h3>Application services at runtime:</h3>
 
 <ul>
   <li>One spark driver</li>
@@ -52,7 +49,7 @@
   <li>Jupyter Lab</li>
 </ul>
 
-<p style="color:#40A7FF;font-size:25px" class="installation">Installation</p>
+<h2 id="installation">Installation</h2>
 
 1. Download [Docker Desktop](https://www.docker.com/products/docker-desktop/) and start docker
 2. Clone Repo 
@@ -75,7 +72,7 @@ sh start.sh
 ```bash
 sh teardown.sh
 ```
-<p style="color:#40A7FF;font-size:25px" class="improvements">Improvements</p>
+<h2 id="improvements">Improvements</h2>
 
 <p>
 This project is over engineered as Apache Spark is best suited for big data but I wanted to explore the use of Delta Lake, which was the main focus of this project. Instead I could have used any of the following packages to perform transformations without the use of Apache Spark and most likely would receive a performance boost.
