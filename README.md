@@ -1,4 +1,6 @@
-<h1>UFO Sighting Data ETL Pipeline</h1>
+<h1 align="center"> <img src="img/ufo-deltalake.png" alt="Mr.Grey" width="832" 
+     height="270"/></h1>
+<h2 align="center">UFO Sighting ELT Pipeline</h2>
 
 <p>This project showcases an Extract, Load, Transform (ELT) pipeline built with Python, Apache Spark, Delta Lake, and Docker. The objective of the project is to scrape UFO sighting data from the National UFO Reporting Center (NUFORC) and process it through the Medallion architecture to create a star schema in the Gold layer.</p>
 
@@ -17,6 +19,3 @@
   <li>Delta Lake: Data storage layer with ACID transactions and versioning</li>
   <li>Docker: Containerization platform for easy deployment and reproducibility</li>
 </ul>
-
-<p>By leveraging the power of Python, Apache Spark, Delta Lake, and Docker, this project provides a robust and scalable solution for extracting, transforming, and loading UFO sighting data into a star schema for advanced analysis and insights.</p>
-
