@@ -5,7 +5,7 @@ FROM python:3.9.17-slim-bullseye as python
 USER root
 
 # Project folder name
-ARG PROJECT_FOLDER=/opt/ufo-lakehouse
+ARG PROJECT_FOLDER=/opt/ufo-deltalake
 
 # Keeps Python from generating .pyc files in the container
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -50,7 +50,7 @@ CMD ["jupyter", "lab", "--ip=0.0.0.0", "--port=8888", "--no-browser"]
 FROM bitnami/spark:3.4.0 as spark
 
 # Project folder name
-ARG PROJECT_FOLDER=/opt/ufo-lakehouse
+ARG PROJECT_FOLDER=/opt/ufo-deltalake
 
 USER root
 

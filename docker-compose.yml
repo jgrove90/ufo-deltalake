@@ -10,7 +10,7 @@ x-defaults:
   networks:
     - spark-network
   volumes:
-    - .:/opt/ufo-lakehouse
+    - .:/opt/ufo-deltalake
     - ./logs/spark:/opt/bitnami/spark/logs
     - ./src/spark/spark-defaults.conf:/opt/bitnami/spark/conf/spark-defaults.conf
 
@@ -80,4 +80,4 @@ services:
     ports:
       - 8888:8888
     volumes:
-      - .:/opt/ufo-lakehouse
+      - .:/opt/ufo-deltalake

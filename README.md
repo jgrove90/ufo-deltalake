@@ -4,9 +4,9 @@
 <h1 align="center" style="color:#40A7FF;font-size:28px"><b>UFO Sighting ELT Pipeline</b></h1>
 
 <p align="center">
-<img src="https://img.shields.io/github/issues/jgrove90/ufo-lakehouse">  
-<img src="https://img.shields.io/github/languages/code-size/jgrove90/ufo-lakehouse">
-<img src="https://img.shields.io/tokei/lines/github/jgrove90/ufo-lakehouse">
+<img src="https://img.shields.io/github/issues/jgrove90/ufo-deltalake">  
+<img src="https://img.shields.io/github/languages/code-size/jgrove90/ufo-deltalake">
+<img src="https://img.shields.io/tokei/lines/github/jgrove90/ufo-deltalake">
 </p>
 
 <p align="center">
