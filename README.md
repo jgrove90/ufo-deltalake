@@ -56,19 +56,15 @@
 ```bash
 git clone https://github.com/jgrove90/ufo-deltalake.git
 ```
-3. Run `docker_build.sh` to create docker images
-```bash
-sh docker_build.sh
-```
-4. Run `start.sh` to start the spark application
+3. Run `start.sh` to start the spark application
 ```bash
 sh start.sh
 ```
-5. Access application services via the web browser
+4. Access application services via the web browser
     * Spark Master UI - `http://localhost:7070/`
     * Spark History Server -  `http://localhost:18080/`
     * Jupyter Lab - `http://localhost:8888/`
-6. Run `teardown.sh` to remove application from system including docker images
+5. Run `teardown.sh` to remove application from system including docker images
 ```bash
 sh teardown.sh
 ```
