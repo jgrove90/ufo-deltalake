@@ -70,11 +70,21 @@ DIM_ASTRO = [
 
 FACT = [
     ("state", "STRING"),
+    ("city", "STRING"),
     ("shape", "STRING"),
     ("year", "INT"),
+    ("month", "INT"),
+    ("week", "INT"),
+    ("dayofweek", "STRING"),
+    ("hour", "INT"),
     ("moonPhaseAngle", "DOUBLE"),
     ("state_count", "INT"),
+    ("city_count", "INT"),
     ("shape_count", "INT"),
     ("year_count", "INT"),
+    ("month_count", "INT"),
+    ("week_count", "INT"),
+    ("day_count", "INT"),
+    ("hour_count", "INT"),
     ("phaseangle_count", "INT"),
 ]
