@@ -7,25 +7,6 @@ import os
 import time
 
 
-def create_missing_folders(folders: list) -> None:
-    """
-    Creates folders that do not exist in the parent directory.
-
-    Args:
-        parent_dir (str): The path to the parent directory.
-        folders (list): A list of folder names to be created.
-
-    Returns:
-        None
-    """
-    for folder in folders:
-        if not os.path.exists(folder):
-            os.makedirs(folder)
-            print(f"Created folder: {folder}")
-        else:
-            print(f"Folder already exists: {folder}")
-
-
 def create_spark_session() -> SparkSession:
     """
     Creates and returns a SparkSession object.
@@ -97,10 +78,6 @@ def main():
     - Performs transformations and loads data into tables
     """
     start_time = time.time()
-
-    # create folders
-    folders = ["./logs/spark"]
-    create_missing_folders(folders)
 
     # create spark session
     spark = create_spark_session()
