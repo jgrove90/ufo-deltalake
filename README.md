@@ -56,7 +56,7 @@
 ```bash
 git clone https://github.com/jgrove90/ufo-deltalake.git
 ```
-3. Run `start.sh` to start the spark application
+3. Run `start.sh` to start the spark application <b>NOTE: You may need to adjust the resources allocated to the master and worker nodes to match your system resources. These settings can be found in: </b> `./src/spark/spark-defaults.conf`
 ```bash
 sh start.sh
 ```
