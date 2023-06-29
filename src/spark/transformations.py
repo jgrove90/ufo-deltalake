@@ -199,6 +199,7 @@ class Transformation:
             logger.error(f"{e}")
             sys.exit()
 
+    # played around creating a fact, not sure if the gold layer is needed since there are no PKs
     def ufo_gold_fact(self) -> DataFrame:
         """
         Performs transformations for the fact_transform table in the gold layer.

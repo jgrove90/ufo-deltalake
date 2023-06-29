@@ -41,7 +41,7 @@ SILVER = [
     ("moonPhaseAngle", "DOUBLE"),
 ]
 
-# Gold layer
+# Gold layer (since there are no PKs not sure if gold layer is required but made it anyway)
 DIM_LOCATION = [
     ("city", "STRING"),
     ("state", "STRING"),
