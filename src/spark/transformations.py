@@ -216,20 +216,35 @@ class Transformation:
                 .load(silver_table)
                 .select(
                     "state",
+                    "city",
                     "shape",
                     "year",
+                    "month",
+                    "week",
+                    "dayofweek",
+                    "hour",
                     "moonPhaseAngle",
                 )
                 .groupBy(
                     "state",
+                    "city",
                     "shape",
                     "year",
+                    "month",
+                    "week",
+                    "dayofweek",
+                    "hour",
                     "moonPhaseAngle",
                 )
                 .agg(
                     count(col("state")).cast("int").alias("state_count"),
+                    count(col("city")).cast("int").alias("city_count"),
                     count(col("shape")).cast("int").alias("shape_count"),
                     count(col("year")).cast("int").alias("year_count"),
+                    count(col("month")).cast("int").alias("month_count"),
+                    count(col("week")).cast("int").alias("week_count"),
+                    count(col("dayofweek")).cast("int").alias("day_count"),
+                    count(col("hour")).cast("int").alias("hour_count"),
                     count(col("moonPhaseAngle")).cast("int").alias("phaseangle_count"),
                 )
             )
