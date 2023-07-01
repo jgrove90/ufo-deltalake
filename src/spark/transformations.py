@@ -105,7 +105,8 @@ class Transformation:
                     "state",
                     "country",
                 )
-                .dropDuplicates()
+                .distinct()
+                .withColumn("location_id", monotonically_increasing_id())
             )
             logger.info(f"Gold layer transformation for dim_location completed")
             return df
@@ -134,7 +135,8 @@ class Transformation:
                     "summary",
                     "images",
                 )
-                .dropDuplicates()
+                .distinct()
+                .withColumn("description_id", monotonically_increasing_id())
             )
             logger.info(f"Gold layer transformation for dim_description completed")
             return df
@@ -165,7 +167,8 @@ class Transformation:
                     "week",
                     "hour",
                 )
-                .dropDuplicates()
+                .distinct()
+                .withColumn("date_id", monotonically_increasing_id())
             )
             logger.info(f"Gold layer transformation for dim_date completed")
             return df
@@ -191,7 +194,8 @@ class Transformation:
                 .select(
                     "moonPhaseAngle",
                 )
-                .dropDuplicates()
+                .distinct()
+                .withColumn("astro_id", monotonically_increasing_id())
             )
             logger.info(f"Gold layer transformation for dim_astro completed")
             return df
@@ -212,31 +216,33 @@ class Transformation:
             If an exception occurs, it returns None.
         """
         try:
+            dim_location = self.spark.read.format("delta").load(
+                "./deltalake/ufo/gold/dim_location"
+            )
+            dim_description = self.spark.read.format("delta").load(
+                "./deltalake/ufo/gold/dim_description"
+            )
+            dim_date = self.spark.read.format("delta").load(
+                "./deltalake/ufo/gold/dim_date"
+            )
+            dim_astro = self.spark.read.format("delta").load(
+                "./deltalake/ufo/gold/dim_astro"
+            )
+
             df = (
                 self.spark.read.format("delta")
                 .load(silver_table)
-                .select(
-                    "state",
-                    "city",
-                    "shape",
-                    "year",
-                    "month",
-                    "week",
-                    "dayofweek",
-                    "hour",
-                    "moonPhaseAngle",
+                .join(dim_location, ["city", "state", "country"], "left")
+                .join(
+                    dim_description, ["shape", "duration", "summary", "images"], "left"
                 )
-                .groupBy(
-                    "state",
-                    "city",
-                    "shape",
-                    "year",
-                    "month",
-                    "week",
-                    "dayofweek",
-                    "hour",
-                    "moonPhaseAngle",
+                .join(
+                    dim_date,
+                    ["date", "year", "month", "dayofweek", "week", "hour"],
+                    "left",
                 )
+                .join(dim_astro, ["moonPhaseAngle"], "left")
+                .groupby("location_id", "description_id", "date_id", "astro_id")
                 .agg(
                     count(col("state")).cast("int").alias("state_count"),
                     count(col("city")).cast("int").alias("city_count"),
