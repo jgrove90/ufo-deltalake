@@ -43,12 +43,14 @@ SILVER = [
 
 # Gold layer (since there are no PKs not sure if gold layer is required but made it anyway)
 DIM_LOCATION = [
+    ("location_id", "LONG"),
     ("city", "STRING"),
     ("state", "STRING"),
     ("country", "STRING"),
 ]
 
 DIM_DESCRIPTION = [
+    ("description_id", "LONG"),
     ("shape", "STRING"),
     ("duration", "STRING"),
     ("summary", "STRING"),
@@ -56,6 +58,7 @@ DIM_DESCRIPTION = [
 ]
 
 DIM_DATE = [
+    ("date_id", "LONG"),
     ("date", "DATE"),
     ("year", "INT"),
     ("month", "INT"),
@@ -65,19 +68,15 @@ DIM_DATE = [
 ]
 
 DIM_ASTRO = [
+    ("astro_id", "LONG"),
     ("moonPhaseAngle", "DOUBLE"),
 ]
 
 FACT = [
-    ("state", "STRING"),
-    ("city", "STRING"),
-    ("shape", "STRING"),
-    ("year", "INT"),
-    ("month", "INT"),
-    ("week", "INT"),
-    ("dayofweek", "STRING"),
-    ("hour", "INT"),
-    ("moonPhaseAngle", "DOUBLE"),
+    ("location_id", "LONG"),
+    ("description_id", "LONG"),
+    ("date_id", "LONG"),
+    ("astro_id", "LONG"),
     ("state_count", "INT"),
     ("city_count", "INT"),
     ("shape_count", "INT"),
