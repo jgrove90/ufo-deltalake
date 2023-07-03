@@ -12,7 +12,7 @@
 <p align="center">
   <a href="#about">About</a> •
   <a href="#installation">Installation</a> •
-  <a href="#https://public.tableau.com/views/UFOSightings_16884121190010/TimeSeries?:language=en-US&:display_count=n&:origin=viz_share_link">Dashboard</a> •
+  <a href="https://public.tableau.com/views/UFOSightings_16884121190010/TimeSeries?:language=en-US&:display_count=n&:origin=viz_share_link">Dashboard</a> •
   <a href="#elt_diagram">ELT Diagram</a> •
   <a href="#improvements">Improvements</a> 
 </p>
