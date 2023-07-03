@@ -1,4 +1,4 @@
-<h1 align="center"> <img src="img/ufo-deltalake.png" alt="Mr.Grey" width="832" 
+<h1 align="center"> <img src="img/banner.png" alt="Mr.Grey" width="832" 
      height="270"/></h1>
 
 <h1 align="center" style="color:#40A7FF;font-size:28px"><b>UFO Sighting ELT Pipeline</b></h1>
@@ -12,7 +12,13 @@
 <p align="center">
   <a href="#about">About</a> •
   <a href="#installation">Installation</a> •
-  <a href="#improvements">Improvements</a>
+  <a href="#https://public.tableau.com/views/UFOSightings_16884121190010/TimeSeries?:language=en-US&:display_count=n&:origin=viz_share_link">Dashboard</a> •
+  <a href="#elt_diagram">ELT Diagram</a> •
+  <a href="#improvements">Improvements</a> 
+</p>
+
+<p align="center">
+<img src="img/dashboard.gif"></a>  
 </p>
 
 <h2 id="about">About</h2>
@@ -27,7 +33,9 @@
 
 <p>The result is a well-organized ELT pipeline that follows the Medallion architecture principles, with Bronze, Silver, and Gold layers. The Bronze layer contains the raw, unprocessed data. The Silver layer represents the transformed and cleansed data, while the Gold layer consists of a star schema, enabling efficient querying and analysis.</p>
 
-<h1 align="center"> <img src="img/medallion.png" alt="Mr.Grey" width="832" 
+
+<h3 id="elt_diagram">ELT Diagram</h2>
+<h1 align="center"><img src="img/diagram.png" alt="Mr.Grey" width="832" 
      height="270"/></h1>
 
 <h3>Key Technologies:</h3>
@@ -37,6 +45,7 @@
   <li>Apache Spark: Big data processing and transformation framework</li>
   <li>Delta Lake: Data storage layer with ACID transactions and versioning</li>
   <li>Docker: Containerization platform for easy deployment and reproducibility</li>
+  <li>Tableau: Containerization platform for easy deployment and reproducibility</li>
 </ul>
 
 <h3>Application services at runtime:</h3>
@@ -48,6 +57,7 @@
   <li>Spark History Server</li>
   <li>Jupyter Lab</li>
 </ul>
+
 
 <h2 id="installation">Installation</h2>
 
@@ -93,6 +103,6 @@ Finally, a more indepth statistical analysis could be performed using:
 
 <ul>
   <li>Jupyter Lab</li>
-  <li>Dashboards (might revisit this in PowerBI)</li>
+  <li>Dashboards (might revisit this in PowerBI/Tableau)</li>
 </ul>
 </p>
