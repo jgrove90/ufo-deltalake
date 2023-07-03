@@ -45,7 +45,7 @@
   <li>Apache Spark: Big data processing and transformation framework</li>
   <li>Delta Lake: Data storage layer with ACID transactions and versioning</li>
   <li>Docker: Containerization platform for easy deployment and reproducibility</li>
-  <li>Tableau: Containerization platform for easy deployment and reproducibility</li>
+  <li>Tableau: Visual analytics platform</li>
 </ul>
 
 <h3>Application services at runtime:</h3>
